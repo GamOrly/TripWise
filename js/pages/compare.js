@@ -2,7 +2,7 @@
 
 import { requireOwner, getTrip } from '../data.js';
 import { icon } from '../icons.js';
-import { showToast } from '../ui.js';
+import { showToast, fitToWindow } from '../ui.js';
 
 const BUDGET_LABELS = { budget: 'Budget', mid: 'Mid-range', luxury: 'Luxury' };
 
@@ -77,5 +77,7 @@ if (session) {
     const list = document.getElementById('routes');
     trip.routes.forEach((r, i) => list.appendChild(routeCard(trip, r, i)));
     document.getElementById('page').hidden = false;
+    // All 3 options fit in the window, on phones too: the screen shrinks instead of scrolling.
+    fitToWindow(document.getElementById('page'), { observe: [list] });
   }
 }

@@ -3,7 +3,7 @@
 import { requireOwner, getTrip, generateRoutes, searchDestinations } from '../data.js';
 import { formatDate, addDays, dayCount, todayISO } from '../dates.js';
 import { icon } from '../icons.js';
-import { openSheet } from '../ui.js';
+import { openSheet, fitToWindow } from '../ui.js';
 
 const BUDGETS = [['budget', 'Budget'], ['mid', 'Mid-range'], ['luxury', 'Luxury']];
 const TYPES = [['backpacking', 'Backpacking'], ['nature', 'Nature'], ['mixed', 'Mixed']];
@@ -421,22 +421,6 @@ window.addEventListener('pageshow', (e) => {
   }
 });
 
-// ---------- Fit to the window (computers only) ----------
-// The screen keeps its portrait phone layout. On a computer it shrinks to the window's height instead of scrolling;
-// on touch devices it stays full size (and scrolls if needed), so tap targets keep their size.
-
-const computer = matchMedia('(hover: hover) and (pointer: fine)');
-
-function fit() {
-  page.style.setProperty('--fit', '1');
-  page.style.minHeight = '0';
-  // One pixel of slack, so rounding never adds a scrollbar.
-  const room = window.innerHeight - 1;
-  const scale = computer.matches ? Math.min(1, room / page.scrollHeight) : 1;
-  page.style.setProperty('--fit', String(scale));
-  page.style.minHeight = `${Math.floor(room / scale)}px`;
-}
-
 // ---------- Start ----------
 
 const session = await requireOwner();
@@ -461,10 +445,6 @@ if (session) {
   setButton('create');
   page.hidden = false;
 
-  fit();
-  // Refit when the content grows or shrinks (children's ages, messages) or the window changes.
-  const columns = new ResizeObserver(() => fit());
-  form.querySelectorAll('.create__col').forEach((c) => columns.observe(c));
-  window.addEventListener('resize', fit);
-  computer.addEventListener('change', fit);
+  // Computers: the screen shrinks to the window instead of scrolling. Touch devices keep full-size fields.
+  fitToWindow(page, { computerOnly: true, observe: [...form.querySelectorAll('.create__col')] });
 }

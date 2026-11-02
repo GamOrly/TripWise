@@ -138,15 +138,15 @@ input.tw-input { flex: none; height: var(--control-md); }
 .create.is-busy #back { color: var(--text-3); pointer-events: none; }
 
 /* ---------- Choose Your Route (screen 04) ---------- */
-.compare { max-width: 480px; margin-inline: auto; padding-top: max(var(--space-2), env(safe-area-inset-top, 0px)); padding-bottom: max(var(--space-6), env(safe-area-inset-bottom, 0px)); }
-.compare__intro { margin: 4px 32px 16px; text-align: center; font: 400 14px/1.45 var(--font-body); color: var(--text-2); }
+.compare { max-width: 480px; margin-inline: auto; padding-top: max(var(--space-2), env(safe-area-inset-top, 0px)); padding-bottom: max(var(--space-4), env(safe-area-inset-bottom, 0px)); zoom: var(--fit, 1); }
+.compare__intro { margin: 0 28px 12px; text-align: center; font: 400 14px/1.45 var(--font-body); color: var(--text-2); }
 .compare__list { padding: 0 var(--space-4); display: flex; flex-direction: column; gap: var(--space-3); }
 .compare .tw-route .tw-btn--sm { flex: none; position: relative; }
 .compare .tw-route .tw-btn--sm::after { content: ""; position: absolute; inset: -4px 0; }
 .create__col { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
 
 /* Computers (mouse, not touch): the portrait screen shrinks to fit the window height, so it never scrolls.
-   create.js sets --fit (1 = full size); on phones and tablets it stays 1. */
+   fitToWindow() in ui.js sets --fit (1 = full size); on phones and tablets it stays 1. */
 .create { zoom: var(--fit, 1); }
 
 /* Destination(s): chosen places as tags, with a suggestions list under the field. */
