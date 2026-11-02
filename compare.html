@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Choose Your Route · Tripwise</title>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/app.css">
+<script type="module" src="js/pages/compare.js"></script>
+</head>
+<body>
+<div class="unavailable" id="unavailable" hidden>
+  <p class="tw-wordmark">Tripwise</p>
+  <main class="unavailable__main">
+    <div class="unavailable__disc"><div class="unavailable__tile" id="unavailable-icon"></div></div>
+    <h1 class="unavailable__title">This trip is not available.</h1>
+  </main>
+  <p class="unavailable__tagline">Plan meaningful trips, one day at a time.</p>
+</div>
+
+<div class="compare" id="page" hidden>
+  <header class="tw-navbar">
+    <a class="tw-iconbtn" href="create.html" id="back" aria-label="Back to Create a New Trip"></a>
+    <h1 class="tw-navbar__title">Choose Your Route</h1>
+    <span></span>
+  </header>
+  <p class="compare__intro">We created 3 route options based on your preferences. Compare and choose the one that fits your family.</p>
+  <main class="compare__list" id="routes"></main>
+</div>
+</body>
+</html>

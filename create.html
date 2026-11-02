@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Create a New Trip · Tripwise</title>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/app.css">
+<script type="module" src="js/pages/create.js"></script>
+</head>
+<body>
+<div class="tw-screen create" id="page" hidden>
+  <header class="tw-navbar">
+    <a class="tw-iconbtn" href="index.html" id="back" aria-label="Back to My Trips"></a>
+    <h1 class="tw-navbar__title">Create a New Trip</h1>
+    <span></span>
+  </header>
+
+  <form class="tw-screen__body create__form" id="create-form" novalidate>
+    <div class="create__col">
+    <div class="tw-field create__dest" id="dest-field">
+      <label class="tw-label" for="dest">Destination(s)</label>
+      <div class="create__combo">
+      <div class="tw-input create__tags" id="dest-box">
+        <span id="dest-icon"></span>
+        <ul class="create__tag-list" id="dest-tags" aria-label="Chosen destinations"></ul>
+        <input id="dest" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="dest-list" maxlength="80" autocomplete="off" spellcheck="false" placeholder="Search a country or city" aria-describedby="dest-hint dest-error">
+      </div>
+      <ul class="create__suggest" id="dest-list" role="listbox" aria-label="Suggested destinations" hidden></ul>
+      </div>
+      <p class="tw-visually-hidden" id="dest-hint">Up to 2 destinations. Type to see suggestions.</p>
+      <p class="tw-field__error" id="dest-error" role="alert" hidden></p>
+    </div>
+
+    <fieldset class="tw-fieldset">
+      <legend>Dates</legend>
+      <div class="create__dates">
+        <div class="tw-field" id="start-field">
+          <div class="tw-input create__date">
+            <span class="create__date-icon"></span>
+            <span class="create__date-text" id="start-text" aria-hidden="true">Start date</span>
+            <input id="start" type="date" aria-label="Start date" aria-describedby="start-error">
+          </div>
+        </div>
+        <div class="tw-field" id="end-field">
+          <div class="tw-input create__date">
+            <span class="create__date-icon"></span>
+            <span class="create__date-text" id="end-text" aria-hidden="true">End date</span>
+            <input id="end" type="date" aria-label="End date" aria-describedby="end-error long-trip">
+          </div>
+        </div>
+      </div>
+      <p class="tw-field__error create__msg" id="start-error" role="alert" hidden></p>
+      <p class="tw-field__error create__msg" id="end-error" role="alert" hidden></p>
+      <div class="tw-notice tw-notice--warning create__msg" id="long-trip" hidden>
+        <span id="long-trip-icon"></span>
+        <p><span class="tw-notice__title">Long trip:</span> generating routes will take longer, up to a few minutes.</p>
+      </div>
+      <div class="create__flex">
+        <label class="tw-check"><input type="checkbox" id="flex" checked>Flexible ±</label>
+        <span class="tw-select tw-select--compact">
+          <select id="flex-days" aria-label="Flexible days (N)">
+            <option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option><option>7</option>
+          </select>
+        </span>
+        <span>days</span>
+        <button type="button" class="tw-iconbtn create__help" id="flex-help" aria-label="What does flexible dates mean?"></button>
+      </div>
+    </fieldset>
+
+    </div>
+
+    <div class="create__col">
+    <fieldset class="tw-fieldset">
+      <legend>Children?</legend>
+      <div class="tw-check-group">
+        <label class="tw-check"><input type="radio" name="kids" value="yes" id="kids-yes">Yes</label>
+        <label class="tw-check"><input type="radio" name="kids" value="no" id="kids-no" checked>No</label>
+      </div>
+    </fieldset>
+
+    <div class="create__kids" id="kids" hidden>
+      <div class="create__kids-count">
+        <label class="tw-label" for="kids-count">Number of children</label>
+        <span class="tw-select create__count">
+          <select id="kids-count"><option>1</option><option selected>2</option><option>3</option><option>4</option></select>
+        </span>
+      </div>
+      <div class="create__ages" id="ages"></div>
+      <p class="tw-field__error" id="ages-error" role="alert" hidden></p>
+    </div>
+
+    <fieldset class="tw-fieldset">
+      <legend>Budget level</legend>
+      <div class="tw-segmented" id="budget"></div>
+    </fieldset>
+
+    <fieldset class="tw-fieldset">
+      <legend>Trip type</legend>
+      <div class="tw-segmented" id="type"></div>
+    </fieldset>
+    </div>
+  </form>
+
+  <footer class="tw-footer create__footer">
+    <div class="tw-status" id="busy" role="status" hidden>
+      <div class="tw-status__row">
+        <span class="tw-status__icon"><span class="tw-spinner tw-spinner--teal"></span></span>
+        <div>
+          <p class="tw-status__title">Creating 3 route options…</p>
+          <p class="tw-status__sub">Please keep this screen open.</p>
+        </div>
+      </div>
+      <div class="tw-progress"><div class="tw-progress__bar"></div></div>
+    </div>
+    <div class="tw-notice tw-notice--error" id="failed" role="alert" hidden>
+      <span id="failed-icon"></span>
+      <p>We couldn't create a route. Please try again.</p>
+    </div>
+    <button type="submit" form="create-form" class="tw-btn tw-btn--primary tw-btn--block" id="submit">Create trip</button>
+  </footer>
+</div>
+
+<div class="tw-scrim" hidden></div>
+<section class="tw-sheet" id="flex-sheet" role="dialog" aria-modal="true" aria-labelledby="flex-sheet-title" hidden>
+  <div class="tw-sheet__handle"></div>
+  <div class="tw-sheet__head">
+    <h2 class="tw-sheet__title" id="flex-sheet-title">Flexible dates</h2>
+    <button type="button" class="tw-iconbtn" data-sheet-close aria-label="Close" id="flex-close"></button>
+  </div>
+  <p class="trip-sheet__text" id="flex-sheet-text"></p>
+  <button type="button" class="tw-btn tw-btn--outline tw-btn--md tw-btn--block" data-sheet-close>Close</button>
+</section>
+</body>
+</html>

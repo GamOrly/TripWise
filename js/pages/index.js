@@ -3,7 +3,6 @@
 import { requireOwner, getTrips, signOut, tripImage, tripName } from '../data.js';
 import { formatRange, tripTiming, sortTrips, pickFeatured } from '../dates.js';
 import { icon } from '../icons.js';
-import { showToast } from '../ui.js';
 
 const CHIPS = {
   current: ['tw-chip--upcoming', 'Now'],
@@ -73,7 +72,6 @@ if (session) {
 
   const createLabel = (btn) => {
     btn.append(icon('plus', { size: 'sm' }), document.createTextNode('Create trip'));
-    btn.addEventListener('click', () => showToast('Creating trips arrives in milestone 3.'));
   };
   createLabel(document.getElementById('create-trip'));
   createLabel(document.getElementById('create-trip-empty'));

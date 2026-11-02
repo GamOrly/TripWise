@@ -104,10 +104,11 @@ const ACTIVITIES = {
 };
 
 // Builds route days from [city, number of days] pairs. Each day has 3 activities, rotating through the city's list.
-function buildDays(startIso, stops) {
+// `youngest` is the youngest child's age: activities with a higher min_age are left out.
+function buildDays(startIso, stops, youngest = Infinity) {
   const days = [];
   for (const [city, count] of stops) {
-    const pool = ACTIVITIES[city];
+    const pool = ACTIVITIES[city].filter((a) => a.min_age <= youngest);
     for (let i = 0; i < count; i++) {
       const n = days.length;
       days.push({
@@ -126,8 +127,43 @@ function buildDays(startIso, stops) {
   return days;
 }
 
-function route(startIso, { title, summary, cities, highlights, image, stops }) {
-  return { title, summary, cities, highlights, image, days: buildDays(startIso, stops) };
+function route(startIso, { title, summary, cities, highlights, image, stops }, youngest) {
+  return { title, summary, cities, highlights, image, days: buildDays(startIso, stops, youngest) };
+}
+
+// The 3 demo routes (Japan, 10 days). The seeded draft uses them as they are; generateRoutes() fits them to the form.
+const JAPAN_ROUTES = [
+  {
+    title: 'Nature & Culture',
+    summary: 'A mix of iconic sights and local experiences.',
+    cities: ['Tokyo', 'Kyoto', 'Osaka'], highlights: ['A mix of iconic sights and local experiences', 'Suitable for children'],
+    image: 'img/route-pagoda.jpg', stops: [['Tokyo', 4], ['Kyoto', 4], ['Osaka', 2]],
+  },
+  {
+    title: 'Active Adventure',
+    summary: 'More time outdoors, with lakes, valleys and gardens.',
+    cities: ['Tokyo', 'Hakone', 'Kyoto'], highlights: ['More outdoor activities', 'Great for nature lovers'],
+    image: 'img/route-mountain-lake.jpg', stops: [['Tokyo', 3], ['Hakone', 3], ['Kyoto', 4]],
+  },
+  {
+    title: 'Relaxed & Scenic',
+    summary: 'Fewer moves and slower days, with a ryokan stay.',
+    cities: ['Tokyo', 'Kyoto', 'Onsen'], highlights: ['Relaxed and comfortable', 'Good for families with young children'],
+    image: 'img/route-ryokan.jpg', stops: [['Tokyo', 4], ['Hakone', 2], ['Kyoto', 4]],
+  },
+];
+
+// Spreads a template's stops over `total` days, keeping the template's proportions (largest remainder).
+// Shorter than the number of stops: the first stops get one day each.
+function fitStops(stops, total) {
+  if (total < stops.length) return stops.slice(0, total).map(([city]) => [city, 1]);
+  const planned = stops.reduce((sum, [, n]) => sum + n, 0);
+  const exact = stops.map(([, n]) => 1 + (n / planned) * (total - stops.length));
+  const counts = exact.map(Math.floor);
+  let left = total - counts.reduce((a, b) => a + b, 0);
+  const order = exact.map((x, i) => [x - Math.floor(x), i]).sort((a, b) => b[0] - a[0]);
+  for (const [, i] of order) if (left-- > 0) counts[i]++;
+  return stops.map(([city], i) => [city, counts[i]]);
 }
 
 function trip(fields) {
@@ -235,26 +271,7 @@ function buildSeed(today) {
     trip({
       id: 'trip-japan-draft', status: 'draft', destinations: ['Japan'], start_date: draftStart, end_date: addDays(draftStart, 9),
       flex_days: 3, budget_tier: 'budget', trip_type: 'nature', created_at: created,
-      routes: [
-        route(draftStart, {
-          title: 'Nature & Culture',
-          summary: 'A mix of iconic sights and local experiences.',
-          cities: ['Tokyo', 'Kyoto', 'Osaka'], highlights: ['A mix of iconic sights and local experiences', 'Suitable for children'],
-          image: 'img/route-pagoda.jpg', stops: [['Tokyo', 4], ['Kyoto', 4], ['Osaka', 2]],
-        }),
-        route(draftStart, {
-          title: 'Active Adventure',
-          summary: 'More time outdoors, with lakes, valleys and gardens.',
-          cities: ['Tokyo', 'Hakone', 'Kyoto'], highlights: ['More outdoor activities', 'Great for nature lovers'],
-          image: 'img/route-mountain-lake.jpg', stops: [['Tokyo', 3], ['Hakone', 3], ['Kyoto', 4]],
-        }),
-        route(draftStart, {
-          title: 'Relaxed & Scenic',
-          summary: 'Fewer moves and slower days, with a ryokan stay.',
-          cities: ['Tokyo', 'Kyoto', 'Onsen'], highlights: ['Relaxed and comfortable', 'Good for families with young children'],
-          image: 'img/route-ryokan.jpg', stops: [['Tokyo', 4], ['Hakone', 2], ['Kyoto', 4]],
-        }),
-      ],
+      routes: JAPAN_ROUTES.map((r) => route(draftStart, r)),
     }),
   ];
 }
@@ -347,6 +364,85 @@ export async function getTripForViewing(id) {
   if (!trip || trip.status !== 'saved') return null;
   if (await getSession()) return { trip, mode: 'owner' };
   return trip.is_shared ? { trip, mode: 'viewer' } : null;
+}
+
+// ---------- Destination suggestions ----------
+// Real app: could call a places search service. Demo: a local list of countries and popular family cities.
+
+const COUNTRIES = [
+  'Albania', 'Argentina', 'Australia', 'Austria', 'Belgium', 'Bosnia and Herzegovina', 'Brazil', 'Bulgaria', 'Cambodia',
+  'Canada', 'Chile', 'China', 'Colombia', 'Costa Rica', 'Croatia', 'Cyprus', 'Czech Republic', 'Denmark', 'Ecuador',
+  'Egypt', 'Estonia', 'Finland', 'France', 'Georgia', 'Germany', 'Greece', 'Hungary', 'Iceland', 'India', 'Indonesia',
+  'Ireland', 'Israel', 'Italy', 'Japan', 'Jordan', 'Kenya', 'Latvia', 'Lithuania', 'Luxembourg', 'Malaysia', 'Maldives',
+  'Malta', 'Mauritius', 'Mexico', 'Montenegro', 'Morocco', 'Nepal', 'Netherlands', 'New Zealand', 'North Macedonia',
+  'Norway', 'Peru', 'Philippines', 'Poland', 'Portugal', 'Romania', 'Scotland', 'Serbia', 'Seychelles', 'Singapore',
+  'Slovakia', 'Slovenia', 'South Africa', 'South Korea', 'Spain', 'Sri Lanka', 'Sweden', 'Switzerland', 'Taiwan',
+  'Tanzania', 'Thailand', 'Tunisia', 'Turkey', 'United Arab Emirates', 'United Kingdom', 'United States', 'Uruguay', 'Vietnam',
+];
+
+const CITIES = [
+  ['Amsterdam', 'Netherlands'], ['Athens', 'Greece'], ['Bangkok', 'Thailand'], ['Barcelona', 'Spain'], ['Berlin', 'Germany'],
+  ['Budapest', 'Hungary'], ['Buenos Aires', 'Argentina'], ['Cape Town', 'South Africa'], ['Copenhagen', 'Denmark'],
+  ['Crete', 'Greece'], ['Dubai', 'United Arab Emirates'], ['Dublin', 'Ireland'], ['Edinburgh', 'United Kingdom'],
+  ['Florence', 'Italy'], ['Hakone', 'Japan'], ['Hanoi', 'Vietnam'], ['Hawaii', 'United States'], ['Hokkaido', 'Japan'],
+  ['Istanbul', 'Turkey'], ['Kyoto', 'Japan'], ['Lisbon', 'Portugal'], ['London', 'United Kingdom'], ['Los Angeles', 'United States'],
+  ['Madeira', 'Portugal'], ['Madrid', 'Spain'], ['Mallorca', 'Spain'], ['Marrakesh', 'Morocco'], ['Melbourne', 'Australia'],
+  ['Milan', 'Italy'], ['Munich', 'Germany'], ['Naples', 'Italy'], ['New York', 'United States'], ['Nice', 'France'],
+  ['Orlando', 'United States'], ['Osaka', 'Japan'], ['Paris', 'France'], ['Phuket', 'Thailand'], ['Prague', 'Czech Republic'],
+  ['Reykjavik', 'Iceland'], ['Rhodes', 'Greece'], ['Rome', 'Italy'], ['Salzburg', 'Austria'], ['San Francisco', 'United States'],
+  ['Santorini', 'Greece'], ['Sardinia', 'Italy'], ['Seoul', 'South Korea'], ['Seville', 'Spain'], ['Sicily', 'Italy'],
+  ['Singapore', 'Singapore'], ['Stockholm', 'Sweden'], ['Sydney', 'Australia'], ['Tenerife', 'Spain'], ['Tokyo', 'Japan'],
+  ['Toronto', 'Canada'], ['Tuscany', 'Italy'], ['Vancouver', 'Canada'], ['Venice', 'Italy'], ['Vienna', 'Austria'],
+  ['Zurich', 'Switzerland'],
+];
+
+const DESTINATIONS = [
+  ...COUNTRIES.map((name) => ({ name, detail: 'Country' })),
+  ...CITIES.filter(([name, country]) => name !== country).map(([name, country]) => ({ name, detail: country })),
+];
+
+// Up to `limit` places whose name (or a word in it) starts with the query. Countries come before cities on a tie.
+// Returns [{ name, detail }], where detail is 'Country' or the city's country.
+export async function searchDestinations(query, { limit = 6, exclude = [] } = {}) {
+  const q = query.trim().toLowerCase();
+  if (!q) return [];
+  const skip = new Set(exclude.map((x) => x.toLowerCase()));
+  const rank = (d) => {
+    const name = d.name.toLowerCase();
+    if (name.startsWith(q)) return 0;
+    if (name.split(/[\s-]+/).some((w) => w.startsWith(q))) return 1;
+    return -1;
+  };
+  return DESTINATIONS
+    .filter((d) => !skip.has(d.name.toLowerCase()))
+    .map((d) => [rank(d), d])
+    .filter(([r]) => r >= 0)
+    .sort((a, b) => a[0] - b[0] || (a[1].detail === 'Country' ? 0 : 1) - (b[1].detail === 'Country' ? 0 : 1) || a[1].name.localeCompare(b[1].name))
+    .slice(0, limit)
+    .map(([, d]) => ({ ...d }));
+}
+
+// ---------- Route generation (simulated) ----------
+
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Creates 3 route options from the Create trip form and stores them as a draft trip. Returns the draft's id.
+// input: { destinations, start_date, end_date, flex_days, has_children, children_ages, budget_tier, trip_type }
+// Real app: api/ask.js (action "generate") asks Gemini, checks the JSON, and the draft row goes to Supabase.
+// Demo: the 3 Japan routes, fitted to the trip's length, after a short wait. `fail` simulates a model error (screen 11).
+export async function generateRoutes(input, { fail = false } = {}) {
+  const days = dayCount(input.start_date, input.end_date);
+  await wait(days > 10 ? 5000 : 2500);
+  if (fail) throw new Error("We couldn't create a route. Please try again.");
+
+  const youngest = input.has_children ? Math.min(...input.children_ages) : Infinity;
+  const routes = JAPAN_ROUTES.map((r) => {
+    const stops = fitStops(r.stops, days);
+    const cities = stops.length === r.stops.length ? r.cities : stops.map(([city]) => city);
+    return route(input.start_date, { ...r, cities, stops }, youngest);
+  });
+  const draft = await saveTrip(trip({ ...input, status: 'draft', routes }));
+  return draft.id;
 }
 
 export async function resetDemo() {
