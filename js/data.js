@@ -19,8 +19,7 @@ const DESTINATION_IMAGES = {
   'Italy': 'img/trip-italy.jpg',
   'Spain': 'img/trip-spain.jpg',
   'USA – National Parks': 'img/trip-usa.jpg',
-  // Temporary: no Greece photo yet, so the current demo trip borrows a calm landscape.
-  'Athens': 'img/route-mountain-lake.jpg',
+  'Athens': 'img/trip-greece.jpg',
 };
 
 // The photo for a trip, or null when there is none yet (the screen shows a placeholder tile).
