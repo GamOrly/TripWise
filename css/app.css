@@ -69,3 +69,38 @@ input.tw-input { flex: none; height: var(--control-md); }
 /* ---------- Simple app pages ---------- */
 .page { max-width: 480px; margin-inline: auto; padding: max(var(--space-safe-top), env(safe-area-inset-top, 0px)) var(--space-5) var(--space-8); }
 .page__title { margin: var(--space-3) 0 var(--space-4); font: 700 30px/36px var(--font-display); letter-spacing: -0.01em; }
+.page__actions { display: flex; align-items: center; gap: var(--space-2); }
+.tw-stack--tight { gap: 10px; }
+.page > .tw-stack { gap: var(--space-4); }
+
+/* ---------- Trip (screens 08, 13) ---------- */
+.trip { max-width: 480px; margin-inline: auto; padding-bottom: var(--space-8); }
+.trip__body { padding: var(--space-2) var(--space-4) 0; display: flex; flex-direction: column; gap: var(--space-4); }
+.trip__head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); padding: 0 4px; }
+.trip__name { margin: 0; font: 700 28px/34px var(--font-display); letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.trip__dates { margin: 2px 0 0; font: 400 15px/20px var(--font-body); color: var(--text-2); }
+.trip__share { padding-top: 4px; flex: none; }
+.trip__day-title { margin: 0; font: 700 22px/28px var(--font-display); }
+.trip__day-title:focus { outline: none; }
+.trip__day-date { margin: 2px 0 0; font: 400 14px/20px var(--font-body); color: var(--text-2); }
+.trip .tw-daytabs { overflow-x: auto; scrollbar-width: none; padding-block: 4px; margin-block: -4px; }
+.trip .tw-daytab { padding: 0 var(--space-3); }
+.trip .tw-daytabs__more { flex: none; width: var(--touch-min); }
+
+/* Touch targets: the look stays as designed, an invisible margin brings the tap area to 44px. */
+.page .tw-btn--sm, .trip .tw-daytab, .trip .tw-switch { position: relative; }
+.page .tw-btn--sm::after, .trip .tw-daytab::after { content: ""; position: absolute; inset: -4px 0; }
+.trip .tw-switch::after { content: ""; position: absolute; inset: -6px -4px; }
+.trip .tw-activity__top { min-height: 22px; }
+.trip-sheet__img { width: 100%; height: 160px; object-fit: cover; border-radius: var(--radius-lg); }
+.trip-sheet__meta { margin: 0; font: 600 13px/18px var(--font-body); color: var(--text-2); }
+.trip-sheet__text { margin: 0; font: 400 15px/1.5 var(--font-body); color: var(--text); }
+.trip-sheet__days { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-2); padding-bottom: var(--space-4); }
+.trip-sheet__days .tw-daytab { height: var(--touch-min); }
+.unavailable { min-height: 100dvh; display: flex; flex-direction: column; align-items: center; padding: 60px var(--space-6) 40px; text-align: center; }
+.unavailable__main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-5); padding-bottom: 60px; }
+.unavailable__disc { width: 132px; height: 132px; border-radius: 50%; background: var(--sand); display: flex; align-items: center; justify-content: center; }
+.unavailable__tile { width: 76px; height: 76px; border-radius: 20px; background: var(--surface); box-shadow: var(--shadow-md); display: flex; align-items: center; justify-content: center; color: var(--deep-teal); }
+.unavailable__tile .tw-icon { width: 36px; height: 36px; stroke-width: 1.6; }
+.unavailable__title { margin: 0; max-width: 260px; font: 700 22px/1.3 var(--font-display); }
+.unavailable__tagline { margin: 0; font: 400 13px/18px var(--font-body); color: var(--text-3); }

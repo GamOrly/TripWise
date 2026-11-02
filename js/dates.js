@@ -49,3 +49,16 @@ export function tripTiming(trip, today = todayISO()) {
   if (trip.start_date > today) return 'upcoming';
   return 'current';
 }
+
+// Trips as shown on My Trips: upcoming first (soonest first), then past (most recent first).
+// The trip happening now counts as upcoming order-wise, so it sorts first.
+export function sortTrips(trips, today = todayISO()) {
+  const rank = (t) => (tripTiming(t, today) === 'past' ? 1 : 0);
+  return [...trips].sort((a, b) => rank(a) - rank(b) || (rank(a) === 0 ? a.start_date.localeCompare(b.start_date) : b.start_date.localeCompare(a.start_date)));
+}
+
+// The big card on My Trips: the trip happening now, else the soonest upcoming one, else none.
+export function pickFeatured(trips, today = todayISO()) {
+  const sorted = sortTrips(trips, today);
+  return sorted.find((t) => tripTiming(t, today) === 'current') || sorted.find((t) => tripTiming(t, today) === 'upcoming') || null;
+}

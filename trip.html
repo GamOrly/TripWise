@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Trip · Tripwise</title>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/app.css">
+<script type="module" src="js/pages/trip.js"></script>
+</head>
+<body>
+<div class="unavailable" id="unavailable" hidden>
+  <p class="tw-wordmark">Tripwise</p>
+  <main class="unavailable__main">
+    <div class="unavailable__disc"><div class="unavailable__tile" id="unavailable-icon"></div></div>
+    <h1 class="unavailable__title">This trip is not available.</h1>
+  </main>
+  <p class="unavailable__tagline">Plan meaningful trips, one day at a time.</p>
+</div>
+
+<div class="trip" id="trip" hidden>
+  <header class="tw-navbar">
+    <a class="tw-iconbtn" href="index.html" id="back" aria-label="Back to My Trips"></a>
+    <h1 class="tw-navbar__title">Trip</h1>
+    <span></span>
+  </header>
+  <main class="trip__body">
+    <div class="trip__head">
+      <div>
+        <h2 class="trip__name" id="name"></h2>
+        <p class="trip__dates" id="dates"></p>
+      </div>
+      <div class="trip__share tw-switch-row" id="share">
+        <span id="share-label">Shared</span>
+        <button type="button" class="tw-switch" role="switch" aria-checked="false" aria-labelledby="share-label" id="share-switch"></button>
+      </div>
+    </div>
+    <div class="tw-notice tw-notice--info" id="share-notice" role="status" hidden>
+      <p>Anyone with the link will see all trip details, including flights, hotels and notes.</p>
+    </div>
+    <div class="tw-daytabs" role="tablist" aria-label="Days" id="tabs"></div>
+    <div>
+      <h3 class="trip__day-title" id="day-title" tabindex="-1"></h3>
+      <p class="trip__day-date" id="day-date"></p>
+    </div>
+    <div class="tw-stack tw-stack--tight" id="activities"></div>
+    <p class="tw-estimate" id="estimate"></p>
+  </main>
+</div>
+
+<div class="tw-scrim" hidden></div>
+<section class="tw-sheet" id="days-sheet" role="dialog" aria-modal="true" aria-labelledby="days-sheet-title" hidden>
+  <div class="tw-sheet__handle"></div>
+  <div class="tw-sheet__head">
+    <h2 class="tw-sheet__title" id="days-sheet-title">All days</h2>
+    <button type="button" class="tw-iconbtn" data-sheet-close aria-label="Close" id="days-close"></button>
+  </div>
+  <div class="trip-sheet__days" id="days-list"></div>
+</section>
+
+<div class="tw-scrim" hidden></div>
+<section class="tw-sheet" id="activity-sheet" role="dialog" aria-modal="true" aria-labelledby="activity-sheet-title" hidden>
+  <div class="tw-sheet__handle"></div>
+  <div class="tw-sheet__head">
+    <h2 class="tw-sheet__title" id="activity-sheet-title"></h2>
+    <button type="button" class="tw-iconbtn" data-sheet-close aria-label="Close" id="activity-close"></button>
+  </div>
+  <div class="tw-stack" id="activity-body"></div>
+</section>
+</body>
+</html>

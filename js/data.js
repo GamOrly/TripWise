@@ -338,6 +338,15 @@ export async function saveTrip(tripRow) {
   return clone(row);
 }
 
+// What a visitor may see. Real app: Row Level Security does this. Demo: the same rule in code.
+// Returns { trip, mode: 'owner' | 'viewer' }, or null when the trip is missing, a draft, or not shared with a visitor.
+export async function getTripForViewing(id) {
+  const trip = await getTrip(id);
+  if (!trip || trip.status !== 'saved') return null;
+  if (await getSession()) return { trip, mode: 'owner' };
+  return trip.is_shared ? { trip, mode: 'viewer' } : null;
+}
+
 export async function resetDemo() {
   memory = null;
   try {
