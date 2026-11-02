@@ -78,3 +78,13 @@ css/app.css         התאמות מסך בלבד
 3. **"Create trip":** Toast זמני "Creating trips arrives in milestone 3." עד שהטופס ייבנה.
 4. **מצב ריק (09):** `index.html?demo=empty` מציג אותו בלי למחוק נתונים, עם קישור מ-`styleguide.html`.
 5. **מסך 08 בלי קטע הלוגיסטיקה** במיילסטון הזה (Flights, Hotels, Notes במיילסטון 5).
+
+## תמונות לפעילויות בטיול הנוכחי (02.11.2026)
+נוספו 5 תמונות מ-Pexels (רישיון Pexels, שימוש חופשי בלי חובת קרדיט), נחתכו ל-800×600 ונדחסו (86–136KB):
+- `img/activity-acropolis.jpg` – Dante Muñoz, https://www.pexels.com/photo/28822021/
+- `img/activity-plaka.jpg` – Seray Demir, https://www.pexels.com/photo/15911487/ (סמטה באתונה, לא מאומת שזו פלאקה)
+- `img/activity-garden.jpg` – https://www.pexels.com/photo/17774484/ (פארק באתונה, לא מאומת שזה הגן הלאומי)
+- `img/activity-elafonisi.jpg` – Maarten van den Heuvel, https://www.pexels.com/photo/30002088/
+- `img/activity-knossos.jpg` – Gu Bra, https://www.pexels.com/photo/18192908/
+
+חסרה עדיין תמונה ל-Samaria Gorge (נשארת אריח חול), ולפעילויות בטיולי איטליה, ספרד, ארה"ב וב-Hakone, Kyoto ו-Osaka.

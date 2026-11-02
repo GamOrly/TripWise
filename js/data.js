@@ -9,6 +9,8 @@
 import { todayISO, addDays, daysBetween, dayCount } from './dates.js';
 
 const STORE_KEY = 'tripwise.demo.v1';
+// Bump when the demo data itself changes (new photos, new trips): saved demo data from older versions is rebuilt.
+const SEED_VERSION = 2;
 const SESSION_KEY = 'tripwise.session.v1';
 const OWNER_ID = '00000000-0000-4000-8000-000000000001';
 
@@ -60,13 +62,13 @@ const ACTIVITIES = {
     { name: 'Dotonbori', reason: 'Street food and bright signs for an evening stroll.', risk_label: 'other', min_age: 0 },
   ],
   'Athens': [
-    { name: 'Acropolis Archaeological Park', reason: 'Suitable for ages 4 and up, a short walk, and open views.', risk_label: 'rough_terrain', min_age: 4, notes: 'Estimated entry 20–30 EUR. Please check the official website.' },
-    { name: 'Plaka Neighbourhood', reason: 'Car-free lanes with shade and cafés.', risk_label: 'none', min_age: 0 },
-    { name: 'National Garden', reason: 'A shaded park with a small playground.', risk_label: 'none', min_age: 0 },
+    { name: 'Acropolis Archaeological Park', reason: 'Suitable for ages 4 and up, a short walk, and open views.', risk_label: 'rough_terrain', min_age: 4, notes: 'Estimated entry 20–30 EUR. Please check the official website.', image: 'img/activity-acropolis.jpg' },
+    { name: 'Plaka Neighbourhood', reason: 'Car-free lanes with shade and cafés.', risk_label: 'none', min_age: 0, image: 'img/activity-plaka.jpg' },
+    { name: 'National Garden', reason: 'A shaded park with a small playground.', risk_label: 'none', min_age: 0, image: 'img/activity-garden.jpg' },
   ],
   'Crete': [
-    { name: 'Elafonisi Beach', reason: 'Shallow, warm water that suits young children.', risk_label: 'none', min_age: 0 },
-    { name: 'Knossos Palace', reason: 'An easy archaeological site with clear paths.', risk_label: 'none', min_age: 0 },
+    { name: 'Elafonisi Beach', reason: 'Shallow, warm water that suits young children.', risk_label: 'none', min_age: 0, image: 'img/activity-elafonisi.jpg' },
+    { name: 'Knossos Palace', reason: 'An easy archaeological site with clear paths.', risk_label: 'none', min_age: 0, image: 'img/activity-knossos.jpg' },
     { name: 'Samaria Gorge (lower part)', reason: 'A short walk into the gorge from Agia Roumeli.', risk_label: 'rough_terrain', min_age: 8 },
   ],
   'Rome': [
@@ -295,13 +297,13 @@ let memory = null;
 function load() {
   const today = todayISO();
   const stored = memory || readJSON(STORE_KEY);
-  if (!stored || !Array.isArray(stored.trips)) {
-    memory = { seeded_on: today, trips: buildSeed(today) };
+  if (!stored || !Array.isArray(stored.trips) || stored.seed_version !== SEED_VERSION) {
+    memory = { seed_version: SEED_VERSION, seeded_on: today, trips: buildSeed(today) };
     writeJSON(STORE_KEY, memory);
     return memory;
   }
   const drift = daysBetween(stored.seeded_on, today);
-  memory = drift === 0 ? stored : { seeded_on: today, trips: stored.trips.map((t) => shiftTrip(t, drift)) };
+  memory = drift === 0 ? stored : { seed_version: SEED_VERSION, seeded_on: today, trips: stored.trips.map((t) => shiftTrip(t, drift)) };
   if (drift !== 0) writeJSON(STORE_KEY, memory);
   return memory;
 }
