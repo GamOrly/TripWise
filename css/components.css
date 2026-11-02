@@ -1,0 +1,252 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap");
+
+/* Tripwise components — plain CSS, prefix tw-. Every value comes from tokens.css. */
+
+/* ---------- Base ---------- */
+body { margin: 0; font-family: var(--font-body); color: var(--text); background: var(--ivory); -webkit-font-smoothing: antialiased; }
+.tw-icon { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.tw-icon--sm { width: 14px; height: 14px; stroke-width: 2; }
+.tw-icon--md { width: 18px; height: 18px; }
+.tw-icon--lg { width: 24px; height: 24px; stroke-width: 2; }
+:where(.tw-btn, .tw-iconbtn, .tw-daytab, .tw-segmented button, .tw-switch, .tw-activity__main, .tw-activity__replace, .tw-trip-hero, .tw-trip-row, .tw-link):focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.tw-visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Button ---------- */
+.tw-btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); height: var(--control-lg); padding: 0 var(--space-5); border: 1.5px solid transparent; border-radius: var(--radius-lg); font: 600 16px/20px var(--font-body); text-decoration: none; cursor: pointer; box-sizing: border-box; white-space: nowrap; }
+.tw-btn--primary { background: var(--coral); color: var(--on-coral); }
+.tw-btn--secondary { background: var(--deep-teal); color: var(--on-deep-teal); }
+.tw-btn--outline { background: var(--surface); border-color: var(--deep-teal); color: var(--deep-teal); }
+.tw-btn--text { height: var(--touch-min); padding: 0 var(--space-1); background: transparent; color: var(--deep-teal); font-size: 14px; }
+.tw-btn--sm { height: var(--control-sm); padding: 0 14px; border-radius: var(--radius-md); font-size: 14px; line-height: 18px; gap: 6px; }
+.tw-btn--md { height: var(--control-md); font-size: 15px; }
+.tw-btn--block { display: flex; width: 100%; }
+.tw-btn:disabled, .tw-btn[aria-disabled="true"] { background: var(--disabled-bg); border-color: transparent; color: var(--disabled-text); cursor: not-allowed; }
+.tw-btn--primary.is-busy, .tw-btn--primary.is-busy:disabled { background: var(--coral-muted); color: var(--on-coral); cursor: progress; }
+.tw-spinner { width: 16px; height: 16px; box-sizing: border-box; border-radius: var(--radius-pill); border: 2px solid rgba(37, 39, 71, 0.25); border-top-color: currentColor; animation: tw-spin 0.9s linear infinite; flex: none; }
+.tw-spinner--teal { width: 20px; height: 20px; border-width: 2.5px; border-color: rgba(77, 106, 109, 0.25); border-top-color: var(--deep-teal); }
+@keyframes tw-spin { to { transform: rotate(360deg); } }
+
+/* ---------- Icon button ---------- */
+.tw-iconbtn { width: var(--touch-min); height: var(--touch-min); display: inline-flex; align-items: center; justify-content: center; border: none; border-radius: var(--radius-sm); background: transparent; color: var(--text); cursor: pointer; padding: 0; text-decoration: none; }
+.tw-iconbtn--round { width: 40px; height: 40px; border-radius: var(--radius-pill); background: var(--ivory); }
+
+/* ---------- Text link ---------- */
+.tw-link { display: inline-flex; align-items: center; min-height: var(--touch-min); color: var(--deep-teal); font: 600 14px/18px var(--font-body); text-decoration: none; }
+
+/* ---------- Nav bar & app header ---------- */
+.tw-navbar { display: grid; grid-template-columns: var(--touch-min) 1fr var(--touch-min); align-items: center; padding: 4px 8px; }
+.tw-navbar__title { margin: 0; text-align: center; font: 700 19px/24px var(--font-display); color: var(--text); }
+.tw-appheader { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.tw-wordmark { margin: 0; font: 800 24px/30px var(--font-display); letter-spacing: -0.02em; color: var(--text); }
+
+/* ---------- Field (label + input + error) ---------- */
+.tw-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.tw-label { font: 600 14px/20px var(--font-body); color: var(--text); }
+.tw-label__optional { font-weight: 400; color: var(--text-3); }
+.tw-input { display: flex; align-items: center; gap: 10px; height: var(--control-md); padding: 0 14px; box-sizing: border-box; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); color: var(--deep-teal); }
+.tw-input input, input.tw-input, .tw-input textarea { flex: 1; min-width: 0; border: none; outline: none; background: transparent; font: 400 15px/20px var(--font-body); color: var(--text); padding: 0; }
+input.tw-input { width: 100%; padding: 0 14px; border: 1px solid var(--border); }
+.tw-input input::placeholder, input.tw-input::placeholder, .tw-textarea::placeholder { color: var(--text-3); }
+.tw-input:focus-within, input.tw-input:focus { border: 1.5px solid var(--focus); box-shadow: var(--shadow-focus-field); }
+.tw-field.is-error .tw-input { border: 1.5px solid var(--error); color: var(--error-text); }
+.tw-field.is-warning .tw-input { border: 1.5px solid var(--warning-border); color: var(--warning-text); }
+.tw-field__error { margin: 0; font: 400 13px/18px var(--font-body); color: var(--error-text); }
+.tw-textarea { width: 100%; box-sizing: border-box; resize: vertical; min-height: 88px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--ivory); padding: 12px 14px; font: 400 14px/20px var(--font-body); color: var(--text); outline: none; }
+.tw-textarea:focus { border: 1.5px solid var(--focus); box-shadow: var(--shadow-focus-field); }
+
+/* ---------- Select ---------- */
+.tw-select { position: relative; display: inline-block; min-width: 72px; }
+.tw-select select { width: 100%; height: var(--segment-h); appearance: none; -webkit-appearance: none; box-sizing: border-box; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); padding: 0 34px 0 14px; font: 400 15px/20px var(--font-body); color: var(--text); cursor: pointer; }
+.tw-select--compact select { height: 36px; border-radius: var(--radius-sm); padding: 0 26px 0 12px; }
+.tw-select select:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.tw-select select:disabled { color: var(--text-3); background: var(--ivory); cursor: not-allowed; }
+.tw-select::after { content: ""; position: absolute; right: 13px; top: 50%; width: 7px; height: 7px; margin-top: -6px; border-right: 2px solid var(--deep-teal); border-bottom: 2px solid var(--deep-teal); transform: rotate(45deg); pointer-events: none; }
+.tw-select--compact::after { right: 10px; }
+
+/* ---------- Checkbox & radio ---------- */
+.tw-check { display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--touch-min); font: 400 15px/20px var(--font-body); color: var(--text); cursor: pointer; }
+.tw-check input { width: 20px; height: 20px; margin: 0; accent-color: var(--deep-teal); flex: none; cursor: pointer; }
+.tw-check-group { display: flex; gap: 28px; flex-wrap: wrap; }
+.tw-fieldset { margin: 0; padding: 0; border: none; min-width: 0; }
+.tw-fieldset > legend { padding: 0; margin-bottom: var(--space-2); font: 600 14px/20px var(--font-body); color: var(--text); }
+
+/* ---------- Segmented choice ---------- */
+.tw-segmented { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2); }
+.tw-segmented button { height: var(--segment-h); border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); color: var(--text); font: 500 14px/18px var(--font-body); cursor: pointer; padding: 0 var(--space-2); }
+.tw-segmented button[aria-pressed="true"] { background: var(--deep-teal); border-color: var(--deep-teal); color: var(--on-deep-teal); font-weight: 600; }
+
+/* ---------- Day tabs ---------- */
+.tw-daytabs { display: flex; align-items: center; gap: var(--space-2); }
+.tw-daytab { height: var(--control-sm); padding: 0 var(--space-4); border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--text-2); font: 500 14px/18px var(--font-body); cursor: pointer; white-space: nowrap; }
+.tw-daytab[aria-selected="true"] { background: var(--deep-teal); border-color: var(--deep-teal); color: var(--on-deep-teal); font-weight: 600; }
+.tw-daytabs__more { margin-left: auto; }
+
+/* ---------- Chip ---------- */
+.tw-chip { display: inline-flex; align-items: center; gap: var(--space-1); height: var(--chip-h); padding: 0 10px; border-radius: var(--radius-pill); font: 600 12px/16px var(--font-body); white-space: nowrap; }
+.tw-chip--sm { height: 22px; padding: 0 8px 0 7px; font-size: 11px; gap: 3px; }
+.tw-chip--sm .tw-icon { width: 12px; height: 12px; stroke-width: 2.25; }
+.tw-chip .tw-icon { width: 13px; height: 13px; stroke-width: 2.25; }
+.tw-chip--upcoming { background: var(--success-light); color: var(--success-text); }
+.tw-chip--past { background: var(--sand); color: var(--past-text); }
+.tw-chip--risk { background: var(--error-light); color: var(--error-text); }
+.tw-chip--warning { background: var(--warning-light); color: var(--warning-text); }
+
+/* ---------- Switch ---------- */
+.tw-switch-row { display: inline-flex; align-items: center; gap: 10px; font: 600 15px/20px var(--font-body); color: var(--text); }
+.tw-switch { width: 52px; height: 32px; padding: 3px; box-sizing: border-box; border: none; border-radius: var(--radius-pill); background: var(--switch-off); display: inline-flex; justify-content: flex-start; cursor: pointer; flex: none; }
+.tw-switch::before { content: ""; width: 26px; height: 26px; border-radius: var(--radius-pill); background: var(--surface); box-shadow: 0 1px 3px rgba(37, 39, 71, 0.3); }
+.tw-switch[aria-checked="true"] { background: var(--deep-teal); justify-content: flex-end; }
+
+/* ---------- Notice ---------- */
+.tw-notice { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border-radius: var(--radius-md); font: 400 13px/1.45 var(--font-body); }
+.tw-notice .tw-icon { width: 18px; height: 18px; margin-top: 1px; }
+.tw-notice p { margin: 0; }
+.tw-notice__title { font-weight: 600; }
+.tw-notice--info { background: var(--teal-tint); color: var(--deep-teal-dark); }
+.tw-notice--info .tw-icon { color: var(--deep-teal); }
+.tw-notice--error { background: var(--error-light); border: 1px solid var(--error-border); color: var(--error-text); border-radius: var(--radius-lg); padding: 14px 16px; font-size: 15px; font-weight: 600; }
+.tw-notice--error .tw-icon { width: 22px; height: 22px; }
+.tw-notice--warning { background: var(--warning-light); color: var(--warning-text); }
+
+/* ---------- Estimate line ---------- */
+.tw-estimate { display: flex; align-items: flex-start; justify-content: center; gap: 6px; margin: 0; text-align: center; font: 400 12px/1.45 var(--font-body); color: var(--text-3); }
+.tw-estimate .tw-icon { width: 14px; height: 14px; stroke-width: 2; margin-top: 1px; }
+
+/* ---------- Toast ---------- */
+.tw-toast { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-radius: var(--radius-lg); background: var(--navy); color: var(--surface); box-shadow: var(--shadow-lg); font: 500 14px/20px var(--font-body); }
+.tw-toast__check { width: 22px; height: 22px; border-radius: var(--radius-pill); background: var(--success); color: var(--surface); display: inline-flex; align-items: center; justify-content: center; flex: none; }
+.tw-toast__check .tw-icon { width: 14px; height: 14px; stroke-width: 3; }
+.tw-toast__text { flex: 1; margin: 0; }
+.tw-toast__action { color: var(--blush); font-weight: 600; text-decoration: none; padding: 6px 0; }
+
+/* ---------- Card base ---------- */
+.tw-card { background: var(--surface); border: 1px solid var(--divider); border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); }
+.tw-card--raised { box-shadow: var(--shadow-md); }
+.tw-thumb { display: block; object-fit: cover; border-radius: var(--radius-md); flex: none; }
+
+/* ---------- Trip hero card ---------- */
+.tw-trip-hero { display: block; overflow: hidden; text-decoration: none; color: var(--text); background: var(--surface); border: 1px solid var(--divider); border-radius: var(--radius-2xl); box-shadow: var(--shadow-md); }
+.tw-trip-hero__img { display: block; width: 100%; height: 178px; object-fit: cover; }
+.tw-trip-hero__body { display: flex; align-items: center; gap: var(--space-3); padding: 14px var(--space-4) var(--space-4); }
+.tw-trip-hero__text { flex: 1; min-width: 0; }
+.tw-trip-hero__name { margin: 0; font: 700 24px/30px var(--font-display); }
+.tw-trip-hero__dates { margin: 2px 0 10px; font: 400 15px/20px var(--font-body); color: var(--text-2); }
+.tw-trip-hero__go { width: 36px; height: 36px; border-radius: var(--radius-pill); background: var(--ivory); display: inline-flex; align-items: center; justify-content: center; color: var(--text); flex: none; }
+
+/* ---------- Trip row ---------- */
+.tw-trip-row { display: flex; align-items: center; gap: 14px; padding: 10px; text-decoration: none; color: var(--text); background: var(--surface); border: 1px solid var(--divider); border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); }
+.tw-trip-row .tw-thumb { width: 76px; height: 68px; }
+.tw-trip-row__text { flex: 1; min-width: 0; }
+.tw-trip-row__name { margin: 0; font: 600 16px/22px var(--font-body); }
+.tw-trip-row__dates { margin: 2px 0 6px; font: 400 14px/20px var(--font-body); color: var(--text-2); }
+.tw-trip-row > .tw-icon { color: var(--text-2); margin-right: 4px; }
+
+/* ---------- Route option card ---------- */
+.tw-route { display: flex; flex-direction: column; gap: 10px; padding: var(--space-3); background: var(--surface); border: 1px solid var(--divider); border-radius: var(--radius-xl); box-shadow: var(--shadow-md); }
+.tw-route__top { display: flex; gap: var(--space-3); }
+.tw-route .tw-thumb { width: var(--thumb-route); height: var(--thumb-route); }
+.tw-route__info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.tw-overline { margin: 0; font: 700 12px/16px var(--font-body); letter-spacing: 0.04em; text-transform: uppercase; color: var(--deep-teal); }
+.tw-route__name { margin: 0; font: 700 17px/22px var(--font-display); }
+.tw-meta { display: flex; flex-wrap: wrap; gap: 4px 10px; font: 400 12px/16px var(--font-body); color: var(--text-2); }
+.tw-meta span { display: inline-flex; align-items: center; gap: 4px; }
+.tw-route__cities { margin: 0; display: flex; align-items: center; gap: 4px; font: 600 12px/16px var(--font-body); color: var(--text); }
+.tw-route__cities .tw-icon { color: var(--deep-teal); }
+.tw-route__bottom { display: flex; align-items: flex-end; gap: 10px; }
+.tw-route__bullets { flex: 1; margin: 0; padding-left: var(--space-4); font: 400 13px/1.45 var(--font-body); color: var(--text-2); }
+
+/* ---------- Activity card ---------- */
+.tw-activity { overflow: hidden; background: var(--surface); border: 1px solid var(--divider); border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); }
+.tw-activity__main { width: 100%; display: flex; align-items: center; gap: var(--space-3); padding: 10px; border: none; background: transparent; text-align: left; font-family: var(--font-body); color: var(--text); cursor: pointer; }
+.tw-activity .tw-thumb { width: var(--thumb-activity); height: var(--thumb-activity); }
+.tw-activity__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.tw-activity__top { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.tw-activity__time { font: 600 12px/16px var(--font-body); color: var(--text-2); }
+.tw-activity__name { font: 600 16px/22px var(--font-body); }
+.tw-activity__why { font: 400 13px/1.4 var(--font-body); color: var(--text-2); }
+.tw-activity__main > .tw-icon { color: var(--text-2); }
+.tw-activity__replace { display: flex; align-items: center; justify-content: center; gap: var(--space-2); width: 100%; height: var(--control-md); border: none; border-top: 1px solid var(--divider); background: var(--teal-wash); color: var(--deep-teal); font: 600 15px/20px var(--font-body); text-decoration: none; cursor: pointer; }
+
+/* ---------- Option card (radio) ---------- */
+.tw-option { display: flex; align-items: center; gap: var(--space-3); padding: 10px; background: var(--surface); border: 1px solid var(--divider); border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); cursor: pointer; }
+.tw-option .tw-thumb { width: var(--thumb-activity); height: var(--thumb-activity); }
+.tw-option__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.tw-option__head { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font: 600 15px/20px var(--font-body); }
+.tw-option__why { font: 400 13px/1.4 var(--font-body); color: var(--text-2); }
+.tw-option input { width: 22px; height: 22px; margin: 0 4px 0 0; accent-color: var(--deep-teal); flex: none; }
+.tw-option:has(input:checked), .tw-option.is-selected { padding: 9px; border: 2px solid var(--deep-teal); box-shadow: var(--shadow-selected); }
+.tw-option:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* ---------- Current activity ---------- */
+.tw-current { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3); background: var(--sand-soft); border-radius: var(--radius-xl); }
+.tw-current .tw-thumb { width: var(--thumb-activity); height: var(--thumb-activity); }
+.tw-current__day { margin: 0; font: 700 16px/22px var(--font-display); }
+.tw-current__label { margin: 2px 0 0; font: 600 12px/16px var(--font-body); letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-2); }
+.tw-current__name { margin: 2px 0 0; font: 600 15px/20px var(--font-body); }
+.tw-current__time { margin: 0; font: 400 13px/18px var(--font-body); color: var(--text-2); }
+
+/* ---------- Detail rows (Flights / Hotels / Notes) ---------- */
+.tw-details { overflow: hidden; background: var(--surface); border: 1px solid var(--divider); border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); }
+.tw-detail-row { display: flex; align-items: center; gap: var(--space-3); padding: 14px var(--space-4); }
+.tw-detail-row + .tw-detail-row { border-top: 1px solid var(--divider); }
+.tw-icon-tile { width: var(--icon-tile); height: var(--icon-tile); border-radius: var(--radius-sm); background: var(--teal-tint); color: var(--deep-teal); display: inline-flex; align-items: center; justify-content: center; flex: none; }
+.tw-icon-tile .tw-icon { width: 18px; height: 18px; }
+.tw-detail-row__text { flex: 1; min-width: 0; }
+.tw-detail-row__title { margin: 0; font: 600 15px/20px var(--font-body); }
+.tw-detail-row__empty { margin: 2px 0 0; font: 400 13px/18px var(--font-body); color: var(--text-3); }
+.tw-detail-block { display: flex; flex-direction: column; gap: 10px; padding: 14px var(--space-4); }
+.tw-detail-block + .tw-detail-row, .tw-detail-row + .tw-detail-block, .tw-detail-block + .tw-detail-block { border-top: 1px solid var(--divider); }
+
+/* ---------- Flight & hotel tiles ---------- */
+.tw-flight, .tw-hotel { display: flex; flex-direction: column; gap: var(--space-2); padding: 12px 14px; background: var(--ivory); border-radius: var(--radius-md); }
+.tw-flight__meta { display: flex; justify-content: space-between; font: 600 12px/16px var(--font-body); color: var(--text-2); }
+.tw-flight__meta b { color: var(--deep-teal); letter-spacing: 0.04em; }
+.tw-flight__leg { display: flex; align-items: center; gap: 10px; }
+.tw-flight__code { margin: 0; font: 700 20px/24px var(--font-display); }
+.tw-flight__time { margin: 0; font: 400 13px/18px var(--font-body); color: var(--text-2); }
+.tw-flight__path { flex: 1; display: flex; align-items: center; gap: 6px; color: var(--deep-teal); }
+.tw-flight__path::before, .tw-flight__path::after { content: ""; flex: 1; border-top: 1.5px dashed var(--switch-off); }
+.tw-flight__path .tw-icon { width: 18px; height: 18px; transform: rotate(45deg); }
+.tw-flight__end { text-align: right; }
+.tw-hotel { gap: 4px; }
+.tw-hotel__name { margin: 0; font: 600 15px/20px var(--font-body); }
+.tw-hotel__dates { margin: 4px 0 0; display: flex; align-items: center; gap: 4px; font: 600 13px/18px var(--font-body); color: var(--text); }
+.tw-hotel__dates .tw-icon { color: var(--deep-teal); }
+
+/* ---------- Bottom sheet ---------- */
+.tw-scrim { position: absolute; inset: 0; background: var(--scrim); }
+.tw-sheet { position: absolute; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; gap: var(--space-4); padding: 10px var(--space-5) var(--space-safe-bottom); background: var(--surface); border-radius: var(--radius-sheet) var(--radius-sheet) 0 0; box-shadow: var(--shadow-sheet); }
+.tw-sheet--inline { position: relative; }
+.tw-sheet__handle { width: 40px; height: 5px; border-radius: var(--radius-pill); background: var(--border); align-self: center; }
+.tw-sheet__head { display: flex; align-items: center; justify-content: space-between; }
+.tw-sheet__title { display: flex; align-items: center; gap: 10px; margin: 0; font: 700 20px/26px var(--font-display); }
+.tw-sheet__group { margin: 0; padding: 14px; border: 1px solid var(--divider); border-radius: var(--radius-xl); display: flex; flex-direction: column; gap: var(--space-3); }
+.tw-sheet__group > legend { padding: 0 6px; font: 700 13px/16px var(--font-body); letter-spacing: 0.04em; color: var(--deep-teal); }
+.tw-grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
+
+/* ---------- Status card (waiting) ---------- */
+.tw-status { display: flex; flex-direction: column; gap: var(--space-3); padding: 14px var(--space-4); background: var(--surface); border: 1px solid var(--divider); border-radius: var(--radius-xl); box-shadow: var(--shadow-md); }
+.tw-status__row { display: flex; align-items: center; gap: var(--space-3); }
+.tw-status__icon { width: 40px; height: 40px; border-radius: var(--radius-md); background: var(--teal-tint); display: inline-flex; align-items: center; justify-content: center; flex: none; }
+.tw-status__title { margin: 0; font: 600 15px/20px var(--font-body); }
+.tw-status__sub { margin: 2px 0 0; font: 400 13px/18px var(--font-body); color: var(--text-2); }
+.tw-progress { height: 6px; border-radius: var(--radius-pill); background: var(--divider); overflow: hidden; }
+.tw-progress__bar { width: 40%; height: 100%; border-radius: var(--radius-pill); background: var(--teal); animation: tw-slide 1.4s ease-in-out infinite; }
+@keyframes tw-slide { 0% { transform: translateX(-100%); } 100% { transform: translateX(250%); } }
+
+/* ---------- Empty & unavailable states ---------- */
+.tw-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-5); text-align: center; padding: var(--space-8) var(--space-5); }
+.tw-empty__art { position: relative; width: 168px; height: 168px; }
+.tw-empty__disc { position: absolute; inset: 0; border-radius: var(--radius-pill); background: var(--sand); }
+.tw-empty__tile { position: absolute; left: 30px; top: 40px; width: 108px; height: 88px; border-radius: var(--radius-xl); background: var(--surface); box-shadow: var(--shadow-md); display: flex; align-items: center; justify-content: center; color: var(--deep-teal); }
+.tw-empty__tile .tw-icon { width: 44px; height: 44px; stroke-width: 1.5; }
+.tw-empty__badge { position: absolute; right: 6px; top: 18px; width: 44px; height: 44px; border-radius: var(--radius-pill); background: var(--coral); color: var(--on-coral); display: flex; align-items: center; justify-content: center; }
+.tw-empty__title { margin: 0; font: 700 22px/28px var(--font-display); color: var(--text); max-width: 260px; }
+
+/* ---------- Layout helpers for screens ---------- */
+.tw-screen { min-height: 100%; display: flex; flex-direction: column; background: var(--ivory); padding-top: max(var(--space-safe-top), env(safe-area-inset-top, 0px)); box-sizing: border-box; }
+.tw-screen__body { flex: 1; min-height: 0; overflow-y: auto; padding: var(--space-2) var(--space-4) var(--space-4); display: flex; flex-direction: column; gap: 14px; }
+.tw-footer { padding: var(--space-3) var(--space-4) max(var(--space-safe-bottom), env(safe-area-inset-bottom, 0px)); background: var(--ivory); border-top: 1px solid var(--divider); display: flex; flex-direction: column; gap: 10px; }
+.tw-stack { display: flex; flex-direction: column; gap: var(--space-3); }
+
+@media (prefers-reduced-motion: reduce) { .tw-spinner, .tw-progress__bar { animation: none; } }

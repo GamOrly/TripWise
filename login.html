@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sign in · Tripwise</title>
+<meta name="description" content="Plan meaningful trips, one day at a time.">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/app.css">
+<script type="module" src="js/pages/login.js"></script>
+</head>
+<body>
+<main class="signin">
+  <img class="signin__bg" src="img/signin-bg.jpg" alt="">
+  <div class="signin__fade" aria-hidden="true"></div>
+
+  <div class="signin__brand">
+    <h1 class="signin__wordmark">Tripwise</h1>
+    <p class="signin__tagline">Plan meaningful trips, one day at a time.</p>
+  </div>
+
+  <!-- Screens 01 and 17: the email form -->
+  <form class="signin__card" id="signin-form" novalidate>
+    <div>
+      <h2 class="signin__title">Sign in</h2>
+      <p class="signin__intro">Enter your email and we'll send you a sign-in link. No password needed.</p>
+    </div>
+    <div class="tw-field" id="email-field">
+      <label class="tw-label" for="email">Email</label>
+      <div class="tw-input">
+        <svg class="tw-icon" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        <input id="email" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="you@example.com">
+      </div>
+      <p class="tw-field__error" id="email-error" role="alert" hidden>
+        <svg class="tw-icon tw-icon--sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+        <span id="email-error-text"></span>
+      </p>
+      <p class="signin__hint" id="email-hint" aria-live="polite" hidden>
+        Did you mean <button type="button" class="signin__hint-btn" id="email-hint-btn"></button>?
+      </p>
+    </div>
+    <button type="submit" class="tw-btn tw-btn--primary tw-btn--block signin__submit">Send sign-in link</button>
+  </form>
+
+  <!-- Screen 18: link sent -->
+  <section class="signin__card signin__card--sent" id="signin-sent" aria-labelledby="sent-title" hidden>
+    <span class="signin__mail-tile" aria-hidden="true">
+      <svg class="tw-icon" viewBox="0 0 24 24" style="width:28px;height:28px"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+    </span>
+    <h2 class="signin__title" id="sent-title" tabindex="-1">Check your email</h2>
+    <p class="signin__sent-text">If <b id="sent-email"></b> has access to Tripwise, we sent a sign-in link to it. The link works for 1 hour.</p>
+    <!-- Demo only: stands in for the link in the email. Removed when real sign-in is connected. -->
+    <button type="button" class="tw-btn tw-btn--secondary tw-btn--block signin__demo" id="open-link">Prototype: open the link</button>
+    <button type="button" class="tw-btn tw-btn--text" id="different-email">Use a different email</button>
+  </section>
+</main>
+</body>
+</html>

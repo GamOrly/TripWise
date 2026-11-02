@@ -1,0 +1,86 @@
+/* Tripwise — generated from tokens.json (Tripwise Design System). Do not edit by hand. */
+:root {
+  /* Colour */
+  --ivory: #F8F6F0;
+  --sand: #EAE0CC;
+  --sand-soft: #F1EBDF;
+  --warm-taupe: #C9ADA1;
+  --teal: #80A99A;
+  --deep-teal: #4D6A6D;
+  --deep-teal-dark: #3E5558;
+  --teal-tint: #EDF3F1;
+  --teal-wash: #F7FAF9;
+  --navy: #252747;
+  --apricot: #E5A16F;
+  --coral: #FF775E;
+  --coral-muted: #FFB3A5;
+  --lavender: #6758D6;
+  --powder-blue: #7F95D1;
+  --pink: #FF82A9;
+  --blush: #FFC0BE;
+  --pale-pink: #FFEBE7;
+  --success: #22A06B;
+  --success-light: #E7F6EE;
+  --success-text: #17774F;
+  --error: #E54848;
+  --error-light: #FDEBEC;
+  --error-border: #F6CFD1;
+  --error-text: #B83232;
+  --warning-light: #FCEFE3;
+  --warning-border: #C9773A;
+  --warning-text: #7A4115;
+  --surface: #FFFFFF;
+  --text: var(--navy);
+  --text-2: #545771;
+  --text-3: #6B6D85;
+  --past-text: #5A4E3A;
+  --border: #E3DDD1;
+  --divider: #EFEBE3;
+  --switch-off: #C9C3B8;
+  --on-coral: var(--navy);
+  --on-deep-teal: #FFFFFF;
+  --disabled-bg: var(--divider);
+  --disabled-text: var(--text-2);
+  --focus: var(--deep-teal);
+  --scrim: rgba(37, 39, 71, 0.45);
+  /* Type */
+  --font-display: "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
+  --font-body: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-safe-bottom: 34px;
+  --space-safe-top: 48px;
+  /* Radius */
+  --radius-xs: 8px;
+  --radius-sm: 10px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+  --radius-xl: 16px;
+  --radius-2xl: 18px;
+  --radius-sheet: 24px;
+  --radius-pill: 999px;
+  /* Shadow */
+  --shadow-sm: 0 1px 2px rgba(37, 39, 71, 0.06);
+  --shadow-md: 0 1px 2px rgba(37, 39, 71, 0.05), 0 4px 16px rgba(37, 39, 71, 0.07);
+  --shadow-lg: 0 12px 32px rgba(37, 39, 71, 0.18);
+  --shadow-sheet: 0 -12px 32px rgba(37, 39, 71, 0.18);
+  --shadow-selected: 0 0 0 4px rgba(77, 106, 109, 0.12);
+  --shadow-focus-field: 0 0 0 4px rgba(77, 106, 109, 0.15);
+  /* Size */
+  --touch-min: 44px;
+  --control-sm: 40px;
+  --control-md: 48px;
+  --control-lg: 52px;
+  --segment-h: 44px;
+  --chip-h: 24px;
+  --thumb-activity: 72px;
+  --thumb-route: 92px;
+  --icon-tile: 36px;
+  --screen-w: 390px;
+}

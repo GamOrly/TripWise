@@ -1,0 +1,71 @@
+/* Tripwise app layer: what the design system leaves to the app.
+   tokens.css and components.css come from the Tripwise Design System unchanged. */
+
+*, *::before, *::after { box-sizing: border-box; }
+html { height: 100%; -webkit-text-size-adjust: 100%; }
+body { min-height: 100%; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+
+/* Overlays: the components use position: absolute for previews; the app pins them to the viewport. */
+.tw-scrim { position: fixed; z-index: 40; }
+.tw-sheet { position: fixed; z-index: 41; max-height: 90dvh; overflow-y: auto; margin-inline: auto; max-width: 480px; }
+.tw-sheet:focus { outline: none; }
+.tw-toast {
+  position: fixed; z-index: 50;
+  inset-inline: var(--space-5);
+  bottom: max(var(--space-safe-bottom), env(safe-area-inset-bottom, 0px));
+  max-width: 440px; margin-inline: auto;
+}
+.tw-toast__text { flex: 1; margin: 0; }
+
+/* Fix: components.css gives a bare input.tw-input `flex: 1`, which collapses its 48px height inside the column .tw-field. */
+input.tw-input { flex: none; height: var(--control-md); }
+
+/* A trip or activity with no photo yet: a sand tile with a location icon. */
+.tw-thumb--placeholder, .tw-trip-hero__img--placeholder {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--sand); color: var(--deep-teal);
+}
+
+/* ---------- Sign in (screens 01, 17, 18) ---------- */
+.signin {
+  position: relative; min-height: 100dvh; overflow: hidden;
+  display: flex; flex-direction: column; align-items: center;
+  padding: calc(max(var(--space-safe-top), env(safe-area-inset-top, 0px)) + 44px) var(--space-5) max(44px, env(safe-area-inset-bottom, 0px));
+  color: var(--text);
+}
+.signin__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 40% 0; z-index: 0; }
+.signin__fade { position: absolute; inset-inline: 0; top: 0; height: 260px; background: linear-gradient(180deg, rgba(248, 246, 240, 0.72) 0%, rgba(248, 246, 240, 0) 100%); z-index: 0; }
+.signin__brand { position: relative; text-align: center; display: flex; flex-direction: column; align-items: center; gap: var(--space-2); }
+.signin__wordmark { margin: 0; font: 800 44px/52px var(--font-display); letter-spacing: -0.02em; }
+.signin__tagline { margin: 0; max-width: 240px; font: 500 17px/1.4 var(--font-body); }
+.signin__card {
+  position: relative; margin-top: auto; width: 100%; max-width: 430px;
+  background: var(--surface); border-radius: var(--radius-sheet); box-shadow: var(--shadow-lg);
+  padding: var(--space-6) var(--space-5) 22px;
+  display: flex; flex-direction: column; gap: var(--space-4);
+}
+.signin__title { margin: 0; font: 700 20px/26px var(--font-display); }
+.signin__intro { margin: 4px 0 0; font: 400 14px/1.45 var(--font-body); color: var(--text-2); }
+.signin__submit { margin-top: 4px; }
+.signin__card--sent { padding: 28px var(--space-5) 18px; align-items: center; gap: var(--space-3); text-align: center; }
+.signin__card--sent .signin__title { font-size: 22px; line-height: 28px; }
+.signin__card--sent .signin__title:focus { outline: none; }
+.signin__mail-tile { width: 56px; height: 56px; border-radius: var(--radius-xl); background: var(--teal-tint); color: var(--deep-teal); display: flex; align-items: center; justify-content: center; }
+.signin__sent-text { margin: 0; font: 400 15px/1.5 var(--font-body); color: var(--text-2); overflow-wrap: anywhere; }
+.signin__sent-text b { font-weight: 600; color: var(--text); }
+.signin__demo { margin-top: 6px; }
+.signin__hint { margin: 0; font: 400 13px/18px var(--font-body); color: var(--text-2); overflow-wrap: anywhere; }
+.signin__hint-btn {
+  min-height: var(--touch-min); padding: 0; margin-block: -13px;
+  border: none; background: transparent; cursor: pointer;
+  font: 600 13px/18px var(--font-body); color: var(--deep-teal); text-decoration: underline; text-underline-offset: 2px;
+}
+.signin__hint-btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+.tw-field__error { display: flex; align-items: flex-start; gap: 6px; }
+.tw-field__error .tw-icon { margin-top: 1px; }
+
+/* ---------- Simple app pages ---------- */
+.page { max-width: 480px; margin-inline: auto; padding: max(var(--space-safe-top), env(safe-area-inset-top, 0px)) var(--space-5) var(--space-8); }
+.page__title { margin: var(--space-3) 0 var(--space-4); font: 700 30px/36px var(--font-display); letter-spacing: -0.01em; }
