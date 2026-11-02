@@ -92,6 +92,7 @@ input.tw-input { flex: none; height: var(--control-md); }
 .page .tw-btn--sm::after, .trip .tw-daytab::after { content: ""; position: absolute; inset: -4px 0; }
 .trip .tw-switch::after { content: ""; position: absolute; inset: -6px -4px; }
 .trip .tw-activity__top { min-height: 22px; }
+#activity-sheet { padding-bottom: max(var(--space-5), env(safe-area-inset-bottom, 0px)); }
 .trip-sheet__img { width: 100%; height: 160px; object-fit: cover; border-radius: var(--radius-lg); }
 .trip-sheet__meta { margin: 0; font: 600 13px/18px var(--font-body); color: var(--text-2); }
 .trip-sheet__text { margin: 0; font: 400 15px/1.5 var(--font-body); color: var(--text); }
