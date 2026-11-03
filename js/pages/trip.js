@@ -2,9 +2,10 @@
 // Flights, hotels and notes come in milestone 5.
 
 import { getTripForViewing, saveTrip, tripName } from '../data.js';
-import { formatRange } from '../dates.js';
+import { formatRange, tripTiming } from '../dates.js';
 import { icon } from '../icons.js';
 import { activityCard, openActivitySheet, dayTabs } from '../render.js';
+import { showToast } from '../ui.js';
 
 const found = await getTripForViewing(new URLSearchParams(location.search).get('id') || '');
 
@@ -43,6 +44,14 @@ if (!found || !found.trip.plan) {
     document.getElementById('share').hidden = true;
   }
 
+  // Edit route (owner only, not for past trips): the day-level editing of Trip Details, saved with "Save changes".
+  const editRoute = document.getElementById('edit-route');
+  if (editRoute && owner && tripTiming(trip) !== 'past') {
+    editRoute.href = `plan.html?id=${encodeURIComponent(trip.id)}&edit=1`;
+    editRoute.append(icon('replace', { size: 'md' }), document.createTextNode('Edit route'));
+    editRoute.hidden = false;
+  }
+
   const activities = document.getElementById('activities');
   const tabs = dayTabs({
     getDays: () => days,
@@ -52,4 +61,11 @@ if (!found || !found.trip.plan) {
   });
   tabs.select(0);
   document.getElementById('trip').hidden = false;
+
+  // trip.html?id=…&changes=saved, right after "Save changes" on Edit route.
+  const params = new URLSearchParams(location.search);
+  if (params.get('changes') === 'saved') {
+    history.replaceState(null, '', `${location.pathname}?id=${encodeURIComponent(trip.id)}`);
+    showToast('Changes saved.');
+  }
 }

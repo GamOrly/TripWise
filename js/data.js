@@ -4,14 +4,14 @@
 //
 // A trip has the shape of a row in the `trips` table (spec/ARCHITECTURE.md 4.1).
 // Demo-only additions, to be settled with the backend: day.city, activity.start_time,
-// activity.end_time, activity.image, route.cities, route.highlights, route.image, and a draft's `avoid`
-// (names of the activities the owner replaced, so they are not offered again).
+// activity.end_time, activity.image, route.cities, route.highlights, route.image, `avoid` (names of the activities
+// the owner replaced, so they are not offered again) and a saved trip's `edit_plan` (the route while it is edited).
 
 import { todayISO, addDays, daysBetween, dayCount } from './dates.js';
 
 const STORE_KEY = 'tripwise.demo.v1';
 // Bump when the demo data itself changes (new photos, new trips): saved demo data from older versions is rebuilt.
-const SEED_VERSION = 3;
+const SEED_VERSION = 4;
 const SESSION_KEY = 'tripwise.session.v1';
 const OWNER_ID = '00000000-0000-4000-8000-000000000001';
 
@@ -46,66 +46,66 @@ const ACTIVITIES = {
     { name: 'Tokyo Skytree', reason: 'Panoramic views of the city. Suitable for families with children.', risk_label: 'none', min_age: 0, notes: 'Estimated entry 2,100–3,500 JPY. Please check the official website.', image: 'img/activity-skytree.jpg' },
     { name: 'Sumida Aquarium', reason: 'Indoor aquarium, great for families, especially with young children.', risk_label: 'deep_water', min_age: 0, image: 'img/activity-sumida-aquarium.jpg' },
     { name: 'Tokyo National Museum', reason: 'A large museum with exhibits for all ages.', risk_label: 'none', min_age: 4, image: 'img/activity-national-museum.jpg' },
-    { name: 'Meiji Jingu Shrine', reason: 'A quiet forest walk to a large wooden shrine.', risk_label: 'none', min_age: 0 },
-    { name: 'Shinjuku Gyoen Garden', reason: 'Wide lawns and greenhouses, with room for children to run.', risk_label: 'none', min_age: 0 },
-    { name: 'teamLab Planets', reason: 'Immersive light rooms; some rooms are walked through knee-deep water.', risk_label: 'other', min_age: 0 },
-    { name: 'Ghibli Museum', reason: 'A small museum about the animated films, with a rooftop garden.', risk_label: 'none', min_age: 0, notes: 'Tickets are sold for timed entry only. Please check the official website.' },
-    { name: 'Miraikan Science Museum', reason: 'Hands-on science exhibits and robot demonstrations.', risk_label: 'none', min_age: 5 },
-    { name: 'Odaiba Seaside Park', reason: 'A sandy bay with views of Rainbow Bridge. No swimming.', risk_label: 'none', min_age: 0 },
-    { name: 'Imperial Palace East Gardens', reason: 'Flat paths through old castle walls and gardens.', risk_label: 'none', min_age: 0 },
-    { name: 'Tsukiji Outer Market', reason: 'Small food stalls for a tasting breakfast.', risk_label: 'other', min_age: 0, notes: 'Narrow and busy lanes. Strollers are hard to use here.' },
-    { name: 'KidZania Tokyo', reason: 'A city built for children to try real jobs.', risk_label: 'none', min_age: 3 },
+    { name: 'Meiji Jingu Shrine', reason: 'A quiet forest walk to a large wooden shrine.', risk_label: 'none', min_age: 0, image: 'img/activity-meiji-jingu-shrine.jpg' },
+    { name: 'Shinjuku Gyoen Garden', reason: 'Wide lawns and greenhouses, with room for children to run.', risk_label: 'none', min_age: 0, image: 'img/activity-shinjuku-gyoen-garden.jpg' },
+    { name: 'teamLab Planets', reason: 'Immersive light rooms; some rooms are walked through knee-deep water.', risk_label: 'other', min_age: 0, image: 'img/activity-teamlab-planets.jpg' },
+    { name: 'Ghibli Museum', reason: 'A small museum about the animated films, with a rooftop garden.', risk_label: 'none', min_age: 0, notes: 'Tickets are sold for timed entry only. Please check the official website.', image: 'img/activity-ghibli-museum.jpg' },
+    { name: 'Miraikan Science Museum', reason: 'Hands-on science exhibits and robot demonstrations.', risk_label: 'none', min_age: 5, image: 'img/activity-miraikan-science-museum.jpg' },
+    { name: 'Odaiba Seaside Park', reason: 'A sandy bay with views of Rainbow Bridge. No swimming.', risk_label: 'none', min_age: 0, image: 'img/activity-odaiba-seaside-park.jpg' },
+    { name: 'Imperial Palace East Gardens', reason: 'Flat paths through old castle walls and gardens.', risk_label: 'none', min_age: 0, image: 'img/activity-imperial-palace-east-gardens.jpg' },
+    { name: 'Tsukiji Outer Market', reason: 'Small food stalls for a tasting breakfast.', risk_label: 'other', min_age: 0, notes: 'Narrow and busy lanes. Strollers are hard to use here.', image: 'img/activity-tsukiji-outer-market.jpg' },
+    { name: 'KidZania Tokyo', reason: 'A city built for children to try real jobs.', risk_label: 'none', min_age: 3, image: 'img/activity-kidzania-tokyo.jpg' },
   ],
   'Hakone': [
-    { name: 'Lake Ashi Cruise', reason: 'A calm boat ride with views of Mount Fuji on clear days.', risk_label: 'deep_water', min_age: 0 },
-    { name: 'Hakone Open-Air Museum', reason: 'Outdoor sculptures and a play structure children can climb.', risk_label: 'none', min_age: 0 },
-    { name: 'Owakudani Valley', reason: 'Volcanic valley reached by ropeway, with short paths.', risk_label: 'rough_terrain', min_age: 3 },
-    { name: 'Hakone Shrine', reason: 'A red gate standing in the lake, reached by a short forest path.', risk_label: 'none', min_age: 0 },
-    { name: 'Hakone Ropeway', reason: 'A cable car ride over the mountains, with a view of Mount Fuji.', risk_label: 'other', min_age: 0 },
-    { name: 'Gora Park', reason: 'A small French-style garden with a fountain and a craft house.', risk_label: 'none', min_age: 0 },
-    { name: 'Hakone Glass Forest', reason: 'Sparkling glass art in a garden, with a hands-on workshop.', risk_label: 'none', min_age: 0 },
-    { name: 'Hakone Tozan Railway', reason: 'A slow mountain train that zigzags up the valley.', risk_label: 'none', min_age: 0 },
-    { name: 'Onshi-Hakone Park', reason: 'A short walk to a lake viewpoint, with shade and benches.', risk_label: 'none', min_age: 0 },
-    { name: 'Hakone Checkpoint', reason: 'A rebuilt old border post with costumes and short exhibits.', risk_label: 'none', min_age: 0 },
-    { name: 'Amazake-chaya Teahouse', reason: 'A 400-year-old teahouse serving sweet rice drinks and mochi.', risk_label: 'none', min_age: 0 },
-    { name: 'Old Tokaido Road Walk', reason: 'A stone-paved trail through cedar trees.', risk_label: 'rough_terrain', min_age: 6 },
-    { name: 'Lake Ashi Swan Boats', reason: 'Pedal boats near the shore; life jackets are given.', risk_label: 'deep_water', min_age: 4 },
-    { name: 'Pola Museum of Art', reason: 'A bright museum in the forest, with a nature trail outside.', risk_label: 'none', min_age: 0 },
-    { name: 'Odawara Castle', reason: 'A castle tower with a small samurai museum and a park.', risk_label: 'none', min_age: 0 },
+    { name: 'Lake Ashi Cruise', reason: 'A calm boat ride with views of Mount Fuji on clear days.', risk_label: 'deep_water', min_age: 0, image: 'img/activity-lake-ashi-cruise.jpg' },
+    { name: 'Hakone Open-Air Museum', reason: 'Outdoor sculptures and a play structure children can climb.', risk_label: 'none', min_age: 0, image: 'img/activity-hakone-open-air-museum.jpg' },
+    { name: 'Owakudani Valley', reason: 'Volcanic valley reached by ropeway, with short paths.', risk_label: 'rough_terrain', min_age: 3, image: 'img/activity-owakudani-valley.jpg' },
+    { name: 'Hakone Shrine', reason: 'A red gate standing in the lake, reached by a short forest path.', risk_label: 'none', min_age: 0, image: 'img/activity-hakone-shrine.jpg' },
+    { name: 'Hakone Ropeway', reason: 'A cable car ride over the mountains, with a view of Mount Fuji.', risk_label: 'other', min_age: 0, image: 'img/activity-hakone-ropeway.jpg' },
+    { name: 'Gora Park', reason: 'A small French-style garden with a fountain and a craft house.', risk_label: 'none', min_age: 0, image: 'img/activity-gora-park.jpg' },
+    { name: 'Hakone Glass Forest', reason: 'Sparkling glass art in a garden, with a hands-on workshop.', risk_label: 'none', min_age: 0, image: 'img/activity-hakone-glass-forest.jpg' },
+    { name: 'Hakone Tozan Railway', reason: 'A slow mountain train that zigzags up the valley.', risk_label: 'none', min_age: 0, image: 'img/activity-hakone-tozan-railway.jpg' },
+    { name: 'Onshi-Hakone Park', reason: 'A short walk to a lake viewpoint, with shade and benches.', risk_label: 'none', min_age: 0, image: 'img/activity-onshi-hakone-park.jpg' },
+    { name: 'Hakone Checkpoint', reason: 'A rebuilt old border post with costumes and short exhibits.', risk_label: 'none', min_age: 0, image: 'img/activity-hakone-checkpoint.jpg' },
+    { name: 'Amazake-chaya Teahouse', reason: 'A 400-year-old teahouse serving sweet rice drinks and mochi.', risk_label: 'none', min_age: 0, image: 'img/activity-amazake-chaya-teahouse.jpg' },
+    { name: 'Old Tokaido Road Walk', reason: 'A stone-paved trail through cedar trees.', risk_label: 'rough_terrain', min_age: 6, image: 'img/activity-old-tokaido-road-walk.jpg' },
+    { name: 'Lake Ashi Swan Boats', reason: 'Pedal boats near the shore; life jackets are given.', risk_label: 'deep_water', min_age: 4, image: 'img/activity-lake-ashi-swan-boats.jpg' },
+    { name: 'Pola Museum of Art', reason: 'A bright museum in the forest, with a nature trail outside.', risk_label: 'none', min_age: 0, image: 'img/activity-pola-museum-of-art.jpg' },
+    { name: 'Odawara Castle', reason: 'A castle tower with a small samurai museum and a park.', risk_label: 'none', min_age: 0, image: 'img/activity-odawara-castle.jpg' },
   ],
   'Kyoto': [
-    { name: 'Fushimi Inari Shrine', reason: 'Thousands of red gates; the lower paths are short and shaded.', risk_label: 'rough_terrain', min_age: 0 },
-    { name: 'Arashiyama Bamboo Grove', reason: 'An easy, flat walk through tall bamboo.', risk_label: 'none', min_age: 0 },
-    { name: 'Kinkaku-ji', reason: 'The Golden Pavilion, a short loop around a pond.', risk_label: 'none', min_age: 0 },
-    { name: 'Kyoto Railway Museum', reason: 'Real trains to climb into and a steam train ride.', risk_label: 'none', min_age: 0 },
-    { name: 'Kyoto Aquarium', reason: 'An indoor aquarium with giant salamanders and seals.', risk_label: 'none', min_age: 0 },
-    { name: 'Nijo Castle', reason: 'Singing wooden floors and large gardens.', risk_label: 'none', min_age: 0 },
-    { name: 'Kiyomizu-dera Temple', reason: 'A wooden temple on a hill with views over the city.', risk_label: 'other', min_age: 0, notes: 'Steep, crowded slopes on the way up.' },
-    { name: 'Nishiki Market', reason: 'A covered market street with snacks to taste.', risk_label: 'other', min_age: 0 },
-    { name: "Philosopher's Path", reason: 'A flat canal-side walk lined with trees.', risk_label: 'none', min_age: 0 },
-    { name: 'Monkey Park Iwatayama', reason: 'A short hike up to wild monkeys and a city view.', risk_label: 'rough_terrain', min_age: 3 },
-    { name: 'Sagano Romantic Train', reason: 'A slow open-air train along the river gorge.', risk_label: 'none', min_age: 0 },
-    { name: 'Kyoto Botanical Garden', reason: 'Lawns, a greenhouse and space for a picnic.', risk_label: 'none', min_age: 0 },
-    { name: 'Toei Kyoto Studio Park', reason: 'A film set of an old town, with ninja shows.', risk_label: 'none', min_age: 0 },
-    { name: 'Hozugawa River Boat Ride', reason: 'A wooden boat ride down the river through the hills.', risk_label: 'deep_water', min_age: 4 },
-    { name: 'Ginkaku-ji', reason: 'The Silver Pavilion, with a sand garden and a short hill path.', risk_label: 'none', min_age: 0 },
+    { name: 'Fushimi Inari Shrine', reason: 'Thousands of red gates; the lower paths are short and shaded.', risk_label: 'rough_terrain', min_age: 0, image: 'img/activity-fushimi-inari-shrine.jpg' },
+    { name: 'Arashiyama Bamboo Grove', reason: 'An easy, flat walk through tall bamboo.', risk_label: 'none', min_age: 0, image: 'img/activity-arashiyama-bamboo-grove.jpg' },
+    { name: 'Kinkaku-ji', reason: 'The Golden Pavilion, a short loop around a pond.', risk_label: 'none', min_age: 0, image: 'img/activity-kinkaku-ji.jpg' },
+    { name: 'Kyoto Railway Museum', reason: 'Real trains to climb into and a steam train ride.', risk_label: 'none', min_age: 0, image: 'img/activity-kyoto-railway-museum.jpg' },
+    { name: 'Kyoto Aquarium', reason: 'An indoor aquarium with giant salamanders and seals.', risk_label: 'none', min_age: 0, image: 'img/activity-kyoto-aquarium.jpg' },
+    { name: 'Nijo Castle', reason: 'Singing wooden floors and large gardens.', risk_label: 'none', min_age: 0, image: 'img/activity-nijo-castle.jpg' },
+    { name: 'Kiyomizu-dera Temple', reason: 'A wooden temple on a hill with views over the city.', risk_label: 'other', min_age: 0, notes: 'Steep, crowded slopes on the way up.', image: 'img/activity-kiyomizu-dera-temple.jpg' },
+    { name: 'Nishiki Market', reason: 'A covered market street with snacks to taste.', risk_label: 'other', min_age: 0, image: 'img/activity-nishiki-market.jpg' },
+    { name: "Philosopher's Path", reason: 'A flat canal-side walk lined with trees.', risk_label: 'none', min_age: 0, image: 'img/activity-philosopher-s-path.jpg' },
+    { name: 'Monkey Park Iwatayama', reason: 'A short hike up to wild monkeys and a city view.', risk_label: 'rough_terrain', min_age: 3, image: 'img/activity-monkey-park-iwatayama.jpg' },
+    { name: 'Sagano Romantic Train', reason: 'A slow open-air train along the river gorge.', risk_label: 'none', min_age: 0, image: 'img/activity-sagano-romantic-train.jpg' },
+    { name: 'Kyoto Botanical Garden', reason: 'Lawns, a greenhouse and space for a picnic.', risk_label: 'none', min_age: 0, image: 'img/activity-kyoto-botanical-garden.jpg' },
+    { name: 'Toei Kyoto Studio Park', reason: 'A film set of an old town, with ninja shows.', risk_label: 'none', min_age: 0, image: 'img/activity-toei-kyoto-studio-park.jpg' },
+    { name: 'Hozugawa River Boat Ride', reason: 'A wooden boat ride down the river through the hills.', risk_label: 'deep_water', min_age: 4, image: 'img/activity-hozugawa-river-boat-ride.jpg' },
+    { name: 'Ginkaku-ji', reason: 'The Silver Pavilion, with a sand garden and a short hill path.', risk_label: 'none', min_age: 0, image: 'img/activity-ginkaku-ji.jpg' },
   ],
   'Osaka': [
-    { name: 'Osaka Castle Park', reason: 'Wide lawns and a castle museum with an elevator.', risk_label: 'none', min_age: 0 },
-    { name: 'Kaiyukan Aquarium', reason: 'One of the largest aquariums in the world, all indoors.', risk_label: 'none', min_age: 0 },
-    { name: 'Dotonbori', reason: 'Street food and bright signs for an evening stroll.', risk_label: 'other', min_age: 0 },
-    { name: 'Universal Studios Japan', reason: 'A theme park with rides for every age; plan a full day.', risk_label: 'none', min_age: 0, notes: 'Some rides have height limits. Please check the official website.' },
-    { name: 'Kids Plaza Osaka', reason: 'An indoor play museum with a climbing town.', risk_label: 'none', min_age: 0 },
-    { name: 'Tempozan Ferris Wheel', reason: 'A tall Ferris wheel with views of the bay.', risk_label: 'none', min_age: 0 },
-    { name: 'Expo 70 Commemorative Park', reason: 'A huge park with play areas and the Tower of the Sun.', risk_label: 'none', min_age: 0 },
-    { name: 'Umeda Sky Building', reason: 'An open-air rooftop walkway high above the city.', risk_label: 'none', min_age: 0 },
-    { name: 'Osaka Museum of Housing and Living', reason: 'A full-size old Osaka street to walk through.', risk_label: 'none', min_age: 0 },
-    { name: 'Kuromon Market', reason: 'A food market with fresh fruit and grilled seafood.', risk_label: 'other', min_age: 0 },
-    { name: 'Nakanoshima Park', reason: 'A riverside park with a rose garden.', risk_label: 'none', min_age: 0 },
-    { name: 'Minoo Park Waterfall Walk', reason: 'A forest trail to a tall waterfall.', risk_label: 'rough_terrain', min_age: 4 },
-    { name: 'Cup Noodles Museum', reason: 'Children design and make their own cup of noodles.', risk_label: 'none', min_age: 0 },
-    { name: 'Santa Maria Bay Cruise', reason: 'A short harbour cruise on a copy of an old sailing ship.', risk_label: 'deep_water', min_age: 0 },
-    { name: 'Tennoji Zoo', reason: 'A city zoo with African savanna animals.', risk_label: 'none', min_age: 0 },
+    { name: 'Osaka Castle Park', reason: 'Wide lawns and a castle museum with an elevator.', risk_label: 'none', min_age: 0, image: 'img/activity-osaka-castle-park.jpg' },
+    { name: 'Kaiyukan Aquarium', reason: 'One of the largest aquariums in the world, all indoors.', risk_label: 'none', min_age: 0, image: 'img/activity-kaiyukan-aquarium.jpg' },
+    { name: 'Dotonbori', reason: 'Street food and bright signs for an evening stroll.', risk_label: 'other', min_age: 0, image: 'img/activity-dotonbori.jpg' },
+    { name: 'Universal Studios Japan', reason: 'A theme park with rides for every age; plan a full day.', risk_label: 'none', min_age: 0, notes: 'Some rides have height limits. Please check the official website.', image: 'img/activity-universal-studios-japan.jpg' },
+    { name: 'Kids Plaza Osaka', reason: 'An indoor play museum with a climbing town.', risk_label: 'none', min_age: 0, image: 'img/activity-kids-plaza-osaka.jpg' },
+    { name: 'Tempozan Ferris Wheel', reason: 'A tall Ferris wheel with views of the bay.', risk_label: 'none', min_age: 0, image: 'img/activity-tempozan-ferris-wheel.jpg' },
+    { name: 'Expo 70 Commemorative Park', reason: 'A huge park with play areas and the Tower of the Sun.', risk_label: 'none', min_age: 0, image: 'img/activity-expo-70-commemorative-park.jpg' },
+    { name: 'Umeda Sky Building', reason: 'An open-air rooftop walkway high above the city.', risk_label: 'none', min_age: 0, image: 'img/activity-umeda-sky-building.jpg' },
+    { name: 'Osaka Museum of Housing and Living', reason: 'A full-size old Osaka street to walk through.', risk_label: 'none', min_age: 0, image: 'img/activity-osaka-museum-of-housing-and-living.jpg' },
+    { name: 'Kuromon Market', reason: 'A food market with fresh fruit and grilled seafood.', risk_label: 'other', min_age: 0, image: 'img/activity-kuromon-market.jpg' },
+    { name: 'Nakanoshima Park', reason: 'A riverside park with a rose garden.', risk_label: 'none', min_age: 0, image: 'img/activity-nakanoshima-park.jpg' },
+    { name: 'Minoo Park Waterfall Walk', reason: 'A forest trail to a tall waterfall.', risk_label: 'rough_terrain', min_age: 4, image: 'img/activity-minoo-park-waterfall-walk.jpg' },
+    { name: 'Cup Noodles Museum', reason: 'Children design and make their own cup of noodles.', risk_label: 'none', min_age: 0, image: 'img/activity-cup-noodles-museum.jpg' },
+    { name: 'Santa Maria Bay Cruise', reason: 'A short harbour cruise on a copy of an old sailing ship.', risk_label: 'deep_water', min_age: 0, image: 'img/activity-santa-maria-bay-cruise.jpg' },
+    { name: 'Tennoji Zoo', reason: 'A city zoo with African savanna animals.', risk_label: 'none', min_age: 0, image: 'img/activity-tennoji-zoo.jpg' },
   ],
   'Athens': [
     { name: 'Acropolis Archaeological Park', reason: 'Suitable for ages 4 and up, a short walk, and open views.', risk_label: 'rough_terrain', min_age: 4, notes: 'Estimated entry 20–30 EUR. Please check the official website.', image: 'img/activity-acropolis.jpg' },
@@ -333,6 +333,7 @@ function shiftTrip(t, days) {
     start_date: s(t.start_date),
     end_date: s(t.end_date),
     plan: shiftRoute(t.plan),
+    edit_plan: shiftRoute(t.edit_plan),
     routes: t.routes && t.routes.map(shiftRoute),
     flights: t.flights && Object.fromEntries(Object.entries(t.flights).map(([k, f]) => [k, f && { ...f, date: s(f.date) }])),
     hotels: t.hotels && t.hotels.map((h) => ({ ...h, check_in: s(h.check_in), check_out: s(h.check_out) })),
@@ -498,18 +499,23 @@ export async function generateRoutes(input, { fail = false } = {}) {
 
 const youngestChild = (t) => (t.has_children && t.children_ages?.length ? Math.min(...t.children_ages) : Infinity);
 
-// The draft a Trip Details screen works on: a draft with a chosen route. Throws when there is none.
-function editableDraft(state, id) {
+// The trip a Trip Details screen works on: a draft with a chosen route, or a saved trip being edited
+// ("Edit route"). Throws when there is none.
+function editableTrip(state, id) {
   const t = state.trips.find((x) => x.id === id);
-  if (!t || t.status !== 'draft' || !t.plan) throw new Error('This trip is not available.');
+  if (!t || !workPlan(t)) throw new Error('This trip is not available.');
   return t;
 }
+
+// The route that editing changes: a draft's plan, or a saved trip's working copy (the saved plan stays as it is until
+// "Save changes", so the Trip screen and shared links do not show unsaved edits).
+const workPlan = (t) => (t.status === 'draft' ? t.plan : t.status === 'saved' ? t.edit_plan : null);
 
 // Up to `count` activities that may go into day `dayIndex`. Never one already in that day, the day before or the
 // day after, one the owner replaced before (`avoid`), or one above the youngest child's age.
 // Activities that are not anywhere in the route come first; others only fill the gap.
 function alternativesFor(t, dayIndex, count) {
-  const days = t.plan.days;
+  const days = workPlan(t).days;
   const names = (i) => (days[i] ? days[i].activities.map((a) => a.name) : []);
   const locked = new Set([...names(dayIndex - 1), ...names(dayIndex), ...names(dayIndex + 1)]);
   const avoid = new Set(t.avoid || []);
@@ -540,14 +546,14 @@ export async function selectRoute(id, index) {
 export async function getAlternatives(id, dayIndex, { fail = false } = {}) {
   await wait(1000);
   if (fail) throw new Error("We couldn't find new activities. Please try again.");
-  return alternativesFor(editableDraft(load(), id), dayIndex, 3);
+  return alternativesFor(editableTrip(load(), id), dayIndex, 3);
 }
 
 // Puts `activity` in place of the one at `slot`, at the same hours. Nothing else in the route changes.
 export async function replaceActivity(id, dayIndex, slot, activity) {
   const state = load();
-  const t = editableDraft(state, id);
-  const day = t.plan.days[dayIndex];
+  const t = editableTrip(state, id);
+  const day = workPlan(t).days[dayIndex];
   const old = day.activities[slot];
   // Checked in code, like a model answer: it must still be allowed for this day.
   const allowed = alternativesFor(t, dayIndex, Infinity).find((a) => a.name === activity.name);
@@ -563,8 +569,8 @@ export async function replaceDay(id, dayIndex, { fail = false } = {}) {
   await wait(1500);
   if (fail) throw new Error("We couldn't replace the day. Please try again.");
   const state = load();
-  const t = editableDraft(state, id);
-  const day = t.plan.days[dayIndex];
+  const t = editableTrip(state, id);
+  const day = workPlan(t).days[dayIndex];
   const fresh = alternativesFor(t, dayIndex, day.activities.length);
   if (fresh.length < day.activities.length) throw new Error('No more new activities for this day.');
   const previous = clone(day);
@@ -577,8 +583,8 @@ export async function replaceDay(id, dayIndex, { fail = false } = {}) {
 // Undo for Replace whole day: puts the previous day back as it was.
 export async function restoreDay(id, dayIndex, previous) {
   const state = load();
-  const t = editableDraft(state, id);
-  t.plan.days[dayIndex] = clone(previous);
+  const t = editableTrip(state, id);
+  workPlan(t).days[dayIndex] = clone(previous);
   const back = new Set(previous.activities.map((a) => a.name));
   t.avoid = (t.avoid || []).filter((name) => !back.has(name));
   save(state);
@@ -588,11 +594,47 @@ export async function restoreDay(id, dayIndex, previous) {
 // Save as trip (F10): the draft becomes a saved trip, with its plan as edited.
 export async function saveAsTrip(id) {
   const state = load();
-  const t = editableDraft(state, id);
+  const t = editableTrip(state, id);
+  if (t.status !== 'draft') throw new Error('This trip is not available.');
   t.status = 'saved';
   delete t.avoid;
   save(state);
   return clone(t);
+}
+
+// "Edit route" on the Trip screen: starts a working copy of a saved trip's plan, or continues the one in progress.
+export async function startEditing(id) {
+  const state = load();
+  const t = state.trips.find((x) => x.id === id);
+  if (!t || t.status !== 'saved' || !t.plan) throw new Error('This trip is not available.');
+  if (!t.edit_plan) {
+    t.edit_plan = clone(t.plan);
+    t.avoid = [];
+    save(state);
+  }
+  return clone(t);
+}
+
+// "Save changes": the working copy becomes the trip's plan.
+export async function saveChanges(id) {
+  const state = load();
+  const t = editableTrip(state, id);
+  if (t.status !== 'saved') throw new Error('This trip is not available.');
+  t.plan = t.edit_plan;
+  delete t.edit_plan;
+  delete t.avoid;
+  save(state);
+  return clone(t);
+}
+
+// "Leave" without saving: the working copy is dropped, and the trip stays as it was saved.
+export async function discardChanges(id) {
+  const state = load();
+  const t = state.trips.find((x) => x.id === id);
+  if (!t) return;
+  delete t.edit_plan;
+  delete t.avoid;
+  save(state);
 }
 
 export async function resetDemo() {

@@ -1,8 +1,12 @@
 // Trip Details (screen 05) and Edit Activity (screen 06): the chosen route by day, day-level editing, and Save as trip.
 // Edit Activity is a state of this page: opening it adds a history entry, so the browser's Back returns to Trip Details.
 // Replacements are kept on the draft right away; the trip shows in My Trips only after "Save as trip".
+// plan.html?id=…&edit=1 ("Edit route" on the Trip screen): the same screen for a saved trip. Changes go to a working
+// copy, and the Trip screen shows them only after "Save changes".
 
-import { requireOwner, getTrip, getAlternatives, replaceActivity, replaceDay, restoreDay, saveAsTrip } from '../data.js';
+import {
+  requireOwner, getTrip, getAlternatives, replaceActivity, replaceDay, restoreDay, saveAsTrip, startEditing, saveChanges, discardChanges,
+} from '../data.js';
 import { icon } from '../icons.js';
 import { showToast, openSheet } from '../ui.js';
 import { el, riskChip, thumb, timeRange, dayLabel, activityCard, openActivitySheet, dayTabs } from '../render.js';
@@ -29,6 +33,9 @@ let trip = session && id ? await getTrip(id) : null;
 
 if (!session) {
   // requireOwner() is on its way to the sign-in page.
+} else if (trip?.status === 'saved' && params.get('edit') === '1' && trip.plan) {
+  trip = await startEditing(trip.id);
+  start();
 } else if (trip?.status === 'saved') {
   location.replace(`trip.html?id=${encodeURIComponent(trip.id)}`);
 } else if (!trip || trip.status !== 'draft' || trip.selected_route == null || !trip.plan) {
@@ -43,15 +50,20 @@ function start() {
   const activities = $('activities');
   const replaceDayBtn = $('replace-day');
   const saveBtn = $('save');
-  const days = () => trip.plan.days;
+  const editing = trip.status === 'saved';
+  const work = () => (editing ? trip.edit_plan : trip.plan);
+  const days = () => work().days;
   let busy = false;
 
-  const title = `Trip Details – Option ${trip.selected_route + 1}`;
+  const tripPage = `trip.html?id=${encodeURIComponent(trip.id)}`;
+  const title = editing ? 'Edit Route' : `Trip Details – Option ${trip.selected_route + 1}`;
   document.title = `${title} · Tripwise`;
   $('details-title').textContent = title;
   const back = $('back');
-  back.href = `compare.html?id=${encodeURIComponent(trip.id)}`;
+  back.href = editing ? tripPage : `compare.html?id=${encodeURIComponent(trip.id)}`;
+  back.setAttribute('aria-label', editing ? 'Back to Trip' : 'Back to Choose Your Route');
   back.appendChild(icon('back', { size: 'lg' }));
+  if (editing) saveBtn.textContent = 'Save changes';
   $('edit-back').appendChild(icon('back', { size: 'lg' }));
   $('estimate').append(icon('info'), document.createTextNode('Prices, hours and availability are estimates. Please check the official website.'));
   $('day-failed-icon').appendChild(icon('alert'));
@@ -157,15 +169,35 @@ function start() {
 
   saveBtn.addEventListener('click', async () => {
     saveBtn.disabled = true;
+    if (editing) {
+      await saveChanges(trip.id);
+      location.replace(`${tripPage}&changes=saved`);
+      return;
+    }
     const saved = await saveAsTrip(trip.id);
     location.href = `index.html?saved=${encodeURIComponent(saved.id)}`;
   });
+
+  // Edit route: leaving without saving drops the working copy, after asking when something was changed.
+  if (editing) {
+    const leave = async () => {
+      await discardChanges(trip.id);
+      location.replace(tripPage);
+    };
+    back.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (busy) return;
+      if (JSON.stringify(trip.edit_plan) === JSON.stringify(trip.plan)) leave();
+      else openSheet($('leave-sheet'));
+    });
+    $('leave').addEventListener('click', leave);
+  }
 
   // ---------- Edit Activity ----------
 
   const list = $('alt-list');
   const replaceBtn = $('replace-activity');
-  let editing = null; // { dayIndex, slot, options }
+  let picking = null; // { dayIndex, slot, options }
   let detailsScroll = 0;
   let afterClose = null; // what gets focus back on Trip Details
 
@@ -187,8 +219,8 @@ function start() {
   }
 
   async function loadAlternatives() {
-    const { dayIndex } = editing;
-    const asked = editing;
+    const { dayIndex } = picking;
+    const asked = picking;
     $('alt-failed').hidden = true;
     $('alt-none').hidden = true;
     list.replaceChildren();
@@ -199,18 +231,18 @@ function start() {
       const fail = failFirst.alternatives;
       failFirst.alternatives = false;
       const options = await getAlternatives(trip.id, dayIndex, { fail });
-      if (editing !== asked) return;
-      editing.options = options;
+      if (picking !== asked) return;
+      picking.options = options;
       list.replaceChildren(...options.map(radioOption));
       $('alt-none').hidden = options.length > 0;
       replaceBtn.disabled = options.length === 0;
       list.querySelector('input')?.focus();
     } catch {
-      if (editing !== asked) return;
+      if (picking !== asked) return;
       $('alt-failed').hidden = false;
       $('alt-retry').focus();
     } finally {
-      if (editing === asked) {
+      if (picking === asked) {
         $('alt-loading').hidden = true;
         $('options').setAttribute('aria-busy', 'false');
       }
@@ -218,7 +250,7 @@ function start() {
   }
 
   function showEdit() {
-    const { dayIndex, slot } = editing;
+    const { dayIndex, slot } = picking;
     const day = days()[dayIndex];
     const a = day.activities[slot];
     const info = el('div', 'tw-option__text');
@@ -240,7 +272,7 @@ function start() {
   function openEdit(dayIndex, slot) {
     if (busy) return;
     detailsScroll = window.scrollY;
-    editing = { dayIndex, slot, options: null };
+    picking = { dayIndex, slot, options: null };
     afterClose = () => cardPart(slot, 'replace')?.focus();
     history.pushState({ edit: true }, '', '#edit');
     showEdit();
@@ -248,7 +280,7 @@ function start() {
 
   // Back on Trip Details (Back arrow, Cancel, Replace activity, or the browser's Back).
   function showDetails() {
-    editing = null;
+    picking = null;
     document.title = `${title} · Tripwise`;
     edit.hidden = true;
     details.hidden = false;
@@ -269,9 +301,9 @@ function start() {
 
   replaceBtn.addEventListener('click', async () => {
     const picked = list.querySelector('input:checked');
-    if (!editing?.options || !picked) return;
-    const { dayIndex, slot } = editing;
-    const choice = editing.options[Number(picked.value)];
+    if (!picking?.options || !picked) return;
+    const { dayIndex, slot } = picking;
+    const choice = picking.options[Number(picked.value)];
     replaceBtn.disabled = true;
     try {
       trip = await replaceActivity(trip.id, dayIndex, slot, choice);

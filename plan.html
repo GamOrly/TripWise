@@ -103,6 +103,17 @@
 </section>
 
 <div class="tw-scrim" hidden></div>
+<section class="tw-sheet plan__confirm" id="leave-sheet" role="dialog" aria-modal="true" aria-labelledby="leave-title" aria-describedby="leave-text" hidden>
+  <div class="tw-sheet__handle"></div>
+  <h2 class="tw-sheet__title" id="leave-title">Leave without saving?</h2>
+  <p class="trip-sheet__text" id="leave-text">Your changes to the route will be lost.</p>
+  <div class="plan__pair">
+    <button type="button" class="tw-btn tw-btn--primary" data-sheet-close>Keep editing</button>
+    <button type="button" class="tw-btn tw-btn--outline" id="leave">Leave</button>
+  </div>
+</section>
+
+<div class="tw-scrim" hidden></div>
 <section class="tw-sheet plan__confirm" id="confirm-sheet" role="dialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-text" hidden>
   <div class="tw-sheet__handle"></div>
   <h2 class="tw-sheet__title" id="confirm-title"></h2>
