@@ -3,6 +3,7 @@
 import { requireOwner, getTrips, signOut, tripImage, tripName } from '../data.js';
 import { formatRange, tripTiming, sortTrips, pickFeatured } from '../dates.js';
 import { icon } from '../icons.js';
+import { showToast } from '../ui.js';
 
 const CHIPS = {
   current: ['tw-chip--upcoming', 'Now'],
@@ -68,7 +69,11 @@ const session = await requireOwner();
 if (session) {
   const trips = sortTrips((await getTrips()).filter((t) => t.status === 'saved'));
   // ?demo=empty shows screen 09 without touching the data (linked from styleguide.html).
-  const shown = new URLSearchParams(location.search).get('demo') === 'empty' ? [] : trips;
+  const params = new URLSearchParams(location.search);
+  const shown = params.get('demo') === 'empty' ? [] : trips;
+  // index.html?saved=<id>, right after "Save as trip" (screen 07): that trip is the big card, this visit only.
+  const saved = shown.find((t) => t.id === params.get('saved'));
+  if (params.has('saved')) history.replaceState(null, '', location.pathname);
 
   const createLabel = (btn) => {
     btn.append(icon('plus', { size: 'sm' }), document.createTextNode('Create trip'));
@@ -84,7 +89,7 @@ if (session) {
     document.getElementById('empty').hidden = false;
     list.hidden = true;
   } else {
-    const featured = pickFeatured(shown);
+    const featured = saved || pickFeatured(shown);
     if (featured) list.appendChild(heroCard(featured));
     const rest = el('div', 'tw-stack tw-stack--tight');
     for (const t of shown) if (t !== featured && t.id !== featured?.id) rest.appendChild(rowCard(t));
@@ -96,4 +101,5 @@ if (session) {
     location.replace('login.html');
   });
   document.getElementById('page').hidden = false;
+  if (saved) showToast('Trip saved to My Trips', { action: { text: 'Open', href: `trip.html?id=${encodeURIComponent(saved.id)}` } });
 }

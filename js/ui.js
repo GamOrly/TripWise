@@ -7,6 +7,7 @@ import { icon } from './icons.js';
 let toastTimer = null;
 
 // showToast('Trip saved to My Trips', { action: { text: 'Open', href: 'trip.html?id=…' } })
+// An action with `onClick` instead of `href` is a button (for example Undo); it closes the Toast.
 export function showToast(text, { action, duration = 4000 } = {}) {
   document.querySelector('.tw-toast')?.remove();
   clearTimeout(toastTimer);
@@ -24,7 +25,18 @@ export function showToast(text, { action, duration = 4000 } = {}) {
   label.textContent = text;
 
   toast.append(check, label);
-  if (action) {
+  if (action?.onClick) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'tw-toast__action';
+    button.textContent = action.text;
+    button.addEventListener('click', () => {
+      clearTimeout(toastTimer);
+      toast.remove();
+      action.onClick();
+    });
+    toast.appendChild(button);
+  } else if (action) {
     const link = document.createElement('a');
     link.className = 'tw-toast__action';
     link.href = action.href;

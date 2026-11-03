@@ -1,8 +1,8 @@
 // Choose Your Route (screen 04): the 3 route options of a draft trip, one under the other.
 
-import { requireOwner, getTrip } from '../data.js';
+import { requireOwner, getTrip, selectRoute } from '../data.js';
 import { icon } from '../icons.js';
-import { showToast, fitToWindow } from '../ui.js';
+import { fitToWindow } from '../ui.js';
 
 const BUDGET_LABELS = { budget: 'Budget', mid: 'Mid-range', luxury: 'Luxury' };
 
@@ -55,7 +55,11 @@ function routeCard(trip, route, i) {
   const view = el('button', 'tw-btn tw-btn--primary tw-btn--sm', 'View route');
   view.type = 'button';
   view.setAttribute('aria-describedby', nameId);
-  view.addEventListener('click', () => showToast('Route details arrive in milestone 4.'));
+  view.addEventListener('click', async () => {
+    view.disabled = true;
+    await selectRoute(trip.id, i);
+    location.href = `plan.html?id=${encodeURIComponent(trip.id)}`;
+  });
   const bottom = el('div', 'tw-route__bottom');
   bottom.append(bullets, view);
 

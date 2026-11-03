@@ -88,8 +88,8 @@ input.tw-input { flex: none; height: var(--control-md); }
 .trip .tw-daytabs__more { flex: none; width: var(--touch-min); }
 
 /* Touch targets: the look stays as designed, an invisible margin brings the tap area to 44px. */
-.page .tw-btn--sm, .trip .tw-daytab, .trip .tw-switch { position: relative; }
-.page .tw-btn--sm::after, .trip .tw-daytab::after { content: ""; position: absolute; inset: -4px 0; }
+.page .tw-btn--sm, .trip .tw-daytab, .plan .tw-daytab, .trip .tw-switch { position: relative; }
+.page .tw-btn--sm::after, .trip .tw-daytab::after, .plan .tw-daytab::after { content: ""; position: absolute; inset: -4px 0; }
 .trip .tw-switch::after { content: ""; position: absolute; inset: -6px -4px; }
 .trip .tw-activity__top { min-height: 22px; }
 #activity-sheet { padding-bottom: max(var(--space-5), env(safe-area-inset-bottom, 0px)); }
@@ -169,3 +169,26 @@ input.tw-input { flex: none; height: var(--control-md); }
 .create__option[aria-selected="true"], .create__option:hover { background: var(--teal-tint); }
 .create__option-name { flex: 1; min-width: 0; font: 500 15px/20px var(--font-body); color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .create__option-detail { flex: none; font: 400 13px/18px var(--font-body); color: var(--text-2); }
+
+/* ---------- Trip Details and Edit Activity (screens 05, 06) ---------- */
+/* The activities scroll with the page; the buttons stay at the bottom of the window. */
+.plan { min-height: 100dvh; max-width: 480px; margin-inline: auto; display: flex; flex-direction: column; padding-top: max(var(--space-2), env(safe-area-inset-top, 0px)); }
+.plan__body { flex: 1 0 auto; padding: var(--space-2) var(--space-4) var(--space-4); display: flex; flex-direction: column; gap: 14px; }
+.plan__body--edit { gap: 18px; }
+.plan__footer { position: sticky; bottom: 0; z-index: 2; }
+.plan__footer--pair, .plan__pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.plan .tw-daytabs { overflow-x: auto; scrollbar-width: none; padding-block: 4px; margin-block: -4px; }
+.plan .tw-daytab { padding: 0 var(--space-3); }
+.plan .tw-daytabs__more { flex: none; width: var(--touch-min); }
+.plan .tw-activity__top { min-height: 22px; }
+.plan .tw-btn--outline:disabled { background: var(--surface); border-color: var(--border); color: var(--text-3); }
+.plan .tw-btn--outline .tw-spinner { border-color: rgba(77, 106, 109, 0.25); border-top-color: var(--deep-teal); }
+.plan.is-busy .plan__body { opacity: 0.55; }
+.plan.is-busy #back { color: var(--text-3); pointer-events: none; }
+.plan__options { margin: 0; padding: 0; border: none; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.plan__legend { padding: 0; margin-bottom: 10px; font: 700 18px/24px var(--font-display); }
+.plan__failed { display: flex; flex-direction: column; gap: 10px; }
+#edit-title:focus { outline: none; }
+.plan__confirm { padding-bottom: max(var(--space-5), env(safe-area-inset-bottom, 0px)); }
+button.tw-toast__action { border: none; background: transparent; font: inherit; font-weight: 600; cursor: pointer; min-height: var(--touch-min); margin-block: -12px; }
+button.tw-toast__action:focus-visible { outline: 2px solid var(--blush); outline-offset: 2px; border-radius: 4px; }
