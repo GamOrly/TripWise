@@ -54,6 +54,16 @@
     </div>
     <p class="tw-estimate" id="estimate"></p>
   </main>
+  <div class="tw-footer trip__pending" id="pending" role="status" hidden>
+    <div>
+      <p class="pending__title"><span class="tw-chip tw-chip--sm tw-chip--warning">Not saved</span><span id="pending-text"></span></p>
+      <p class="pending__hint">Save or discard this change to make another one.</p>
+    </div>
+    <div class="pending__actions">
+      <button type="button" class="tw-btn tw-btn--secondary tw-btn--md tw-btn--block" id="pending-save"></button>
+      <button type="button" class="tw-btn tw-btn--outline tw-btn--md tw-btn--block" id="pending-discard">Discard change</button>
+    </div>
+  </div>
 </div>
 
 <!-- Edit Activity (screen 06): a state of this page, not a page of its own -->
@@ -122,6 +132,16 @@
   <div class="plan__pair">
     <button type="button" class="tw-btn tw-btn--primary" id="confirm-day">Replace day</button>
     <button type="button" class="tw-btn tw-btn--outline" data-sheet-close>Cancel</button>
+  </div>
+</section>
+<div class="tw-scrim" hidden></div>
+<section class="tw-sheet plan__confirm" id="leave-sheet" role="dialog" aria-modal="true" aria-labelledby="leave-title" aria-describedby="leave-text" hidden>
+  <div class="tw-sheet__handle"></div>
+  <h2 class="tw-sheet__title" id="leave-title">Leave without saving?</h2>
+  <p class="trip-sheet__text" id="leave-text">Your change will be discarded.</p>
+  <div class="plan__pair">
+    <button type="button" class="tw-btn tw-btn--primary" data-sheet-close>Keep editing</button>
+    <button type="button" class="tw-btn tw-btn--outline" id="leave">Leave</button>
   </div>
 </section>
 </body>

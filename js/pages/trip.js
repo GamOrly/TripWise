@@ -1,5 +1,6 @@
 // Trip (screens 08 and 13): the itinerary by day. The owner also gets the Shared switch and, while the trip has not
-// ended, "Replace activity" and "Replace whole day" (editor.js), saved right away. A visitor with the link only reads.
+// ended, "Replace activity" and "Replace whole day" (editor.js): one change at a time, which shows at once and goes
+// into the trip only with "Save changes to trip". A visitor with the link only reads what was saved.
 // Flights, hotels and notes come in milestone 5.
 
 import { getTripForViewing, saveTrip, tripName, canEdit } from '../data.js';
@@ -52,6 +53,9 @@ if (!found || !found.trip.plan) {
     trip,
     view: document.getElementById('trip'),
     editable: owner && canEdit(trip),
+    saveLabel: 'Save changes to trip',
+    savedText: 'Changes saved to trip.',
+    back: owner ? back : null,
     inert: [document.getElementById('tabs'), document.getElementById('activities'), share],
     lock: [back],
     onChange: (next) => {

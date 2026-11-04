@@ -199,3 +199,18 @@ input.tw-input { flex: none; height: var(--control-md); }
 .plan__confirm { padding-bottom: max(var(--space-5), env(safe-area-inset-bottom, 0px)); }
 button.tw-toast__action { border: none; background: transparent; font: inherit; font-weight: 600; cursor: pointer; min-height: var(--touch-min); margin-block: -12px; }
 button.tw-toast__action:focus-visible { outline: 2px solid var(--blush); outline-offset: 2px; border-radius: 4px; }
+
+/* ---------- One change at a time (Trip Details and Trip) ---------- */
+/* The card of a replacement that is not saved yet, and the bar that saves or discards it. */
+.tw-activity.is-pending { border: 2px solid var(--warning-border); }
+.tw-activity.is-pending .tw-activity__main { padding: 9px; }
+.tw-activity__chips { display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+.tw-activity__replace:disabled { color: var(--text-3); background: var(--surface); cursor: not-allowed; }
+.pending__title { margin: 0; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font: 600 14px/20px var(--font-body); color: var(--text); }
+.pending__hint { margin: 2px 0 0; font: 400 13px/18px var(--font-body); color: var(--text-2); }
+/* One under the other: side by side, "Save changes to trip" and "Discard change" do not fit a 375px screen. */
+.pending__actions { display: flex; flex-direction: column; gap: var(--space-2); }
+.trip__pending { position: sticky; bottom: 0; z-index: 2; }
+/* Trip Details: while a change waits, the bar takes the place of Replace whole day and Save as trip. */
+.plan__pending { position: sticky; bottom: 0; z-index: 2; }
+.plan__pending:not([hidden]) + #footer { display: none; }

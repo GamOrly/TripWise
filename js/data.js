@@ -4,8 +4,9 @@
 //
 // A trip has the shape of a row in the `trips` table (spec/ARCHITECTURE.md 4.1).
 // Demo-only additions, to be settled with the backend: day.city, activity.start_time,
-// activity.end_time, activity.image, route.cities, route.highlights, route.image, and `avoid` (names of the
-// activities the owner replaced, oldest first, so they are offered again only when nothing else is left).
+// activity.end_time, activity.image, route.cities, route.highlights, route.image, `avoid` (names of the
+// activities the owner replaced, oldest first, so they are offered again only when nothing else is left), and
+// `pending` (one replacement shown to the owner but not saved yet: { kind: 'activity' | 'day', day, slot, activities }).
 
 import { todayISO, addDays, daysBetween, dayCount, tripTiming } from './dates.js';
 
@@ -445,7 +446,11 @@ export async function getTripForViewing(id) {
   const trip = await getTrip(id);
   if (!trip || trip.status !== 'saved') return null;
   if (await getSession()) return { trip, mode: 'owner' };
-  return trip.is_shared ? { trip, mode: 'viewer' } : null;
+  if (!trip.is_shared) return null;
+  // A visitor sees only what was saved, never a change the owner has not saved yet.
+  delete trip.pending;
+  delete trip.avoid;
+  return { trip, mode: 'viewer' };
 }
 
 // ---------- Destination suggestions ----------
@@ -577,57 +582,88 @@ export async function selectRoute(id, index) {
     t.selected_route = index;
     t.plan = clone(t.routes[index]);
     t.avoid = [];
+    delete t.pending;
     save(state);
   }
   return clone(t);
+}
+
+// The route as the owner sees it: the plan with the change that is not saved yet (if any) in place.
+export function shownPlan(t) {
+  const p = t.pending;
+  if (!p) return t.plan;
+  const plan = clone(t.plan);
+  const day = plan.days[p.day];
+  if (p.kind === 'activity') day.activities[p.slot] = p.activities[0];
+  else day.activities = p.activities;
+  return plan;
+}
+
+// One change at a time: a new replacement waits until the last one is saved or discarded.
+function noPending(t) {
+  if (t.pending) throw new Error('Save or discard this change to make another one.');
 }
 
 // Edit Activity: 3 activities for day `dayIndex` (fewer only when the city has fewer than that to offer).
 export async function getAlternatives(id, dayIndex, { fail = false } = {}) {
   await wait(1000);
   if (fail) throw new Error("We couldn't find new activities. Please try again.");
-  return alternativesFor(editableTrip(load(), id), dayIndex, 3);
+  const t = editableTrip(load(), id);
+  noPending(t);
+  return alternativesFor(t, dayIndex, 3);
 }
 
-// Puts `activity` in place of the one at `slot`, at the same hours. Nothing else in the route changes.
+// "Replace activity" on Edit Activity: `activity` will take the place of the one at `slot`, at the same hours.
+// It is only shown for now (`pending`); commitChange() puts it in the plan, discardChange() drops it.
 export async function replaceActivity(id, dayIndex, slot, activity) {
   const state = load();
   const t = editableTrip(state, id);
-  const day = t.plan.days[dayIndex];
-  const old = day.activities[slot];
+  noPending(t);
+  const old = t.plan.days[dayIndex].activities[slot];
   // Checked in code, like a model answer: it must still be allowed for this day.
   const allowed = alternativesFor(t, dayIndex, Infinity).find((a) => a.name === activity.name);
   if (!allowed) throw new Error("We couldn't replace the activity. Please try again.");
-  day.activities[slot] = { ...allowed, start_time: old.start_time, end_time: old.end_time };
-  t.avoid = [...(t.avoid || []).filter((name) => name !== old.name), old.name];
+  t.pending = { kind: 'activity', day: dayIndex, slot, activities: [{ ...allowed, start_time: old.start_time, end_time: old.end_time }] };
   save(state);
   return clone(t);
 }
 
-// Replace whole day: 3 new activities at the day's hours. Returns { trip, previous } (the old day, for Undo).
+// Replace whole day: 3 new activities at the day's hours, waiting to be saved or discarded like a single activity.
 export async function replaceDay(id, dayIndex, { fail = false } = {}) {
   await wait(1500);
   if (fail) throw new Error("We couldn't replace the day. Please try again.");
   const state = load();
   const t = editableTrip(state, id);
+  noPending(t);
   const day = t.plan.days[dayIndex];
   const fresh = alternativesFor(t, dayIndex, day.activities.length);
   if (fresh.length < day.activities.length) throw new Error('No more new activities for this day.');
-  const previous = clone(day);
-  day.activities = day.activities.map((old, i) => ({ ...fresh[i], start_time: old.start_time, end_time: old.end_time }));
-  const out = previous.activities.map((a) => a.name);
-  t.avoid = [...(t.avoid || []).filter((name) => !out.includes(name)), ...out];
+  t.pending = { kind: 'day', day: dayIndex, activities: day.activities.map((old, i) => ({ ...fresh[i], start_time: old.start_time, end_time: old.end_time })) };
   save(state);
-  return { trip: clone(t), previous };
+  return clone(t);
 }
 
-// Undo for Replace whole day: puts the previous day back as it was.
-export async function restoreDay(id, dayIndex, previous) {
+// "Save changes to trip" (a saved trip) or "Keep change" (a draft): the waiting change goes into the plan.
+export async function commitChange(id) {
   const state = load();
   const t = editableTrip(state, id);
-  t.plan.days[dayIndex] = clone(previous);
-  const back = new Set(previous.activities.map((a) => a.name));
-  t.avoid = (t.avoid || []).filter((name) => !back.has(name));
+  const p = t.pending;
+  if (!p) return clone(t);
+  const day = t.plan.days[p.day];
+  const out = p.kind === 'activity' ? [day.activities[p.slot].name] : day.activities.map((a) => a.name);
+  t.plan = shownPlan(t);
+  delete t.pending;
+  t.avoid = [...(t.avoid || []).filter((name) => !out.includes(name)), ...out];
+  save(state);
+  return clone(t);
+}
+
+// "Discard change" (or "Leave" without saving): the route stays exactly as it was.
+export async function discardChange(id) {
+  const state = load();
+  const t = state.trips.find((x) => x.id === id);
+  if (!t) throw new Error('This trip is not available.');
+  delete t.pending;
   save(state);
   return clone(t);
 }
@@ -637,6 +673,7 @@ export async function saveAsTrip(id) {
   const state = load();
   const t = editableTrip(state, id);
   if (t.status !== 'draft') throw new Error('This trip is not available.');
+  noPending(t);
   t.status = 'saved';
   delete t.avoid;
   save(state);

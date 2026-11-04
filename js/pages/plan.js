@@ -1,5 +1,6 @@
 // Trip Details (screen 05) and Edit Activity (screen 06): the chosen route by day, day-level editing, and Save as trip.
-// Replacements are kept on the draft right away; the trip shows in My Trips only after "Save as trip".
+// One change at a time: each replacement is kept ("Keep change") or discarded before the next one, and
+// "Save as trip" waits until no change is open. The trip shows in My Trips only after "Save as trip".
 // The day-level editing itself lives in editor.js, shared with the Trip screen.
 
 import { requireOwner, getTrip, saveAsTrip, canEdit } from '../data.js';
@@ -36,7 +37,17 @@ if (!session) {
   $('estimate').append(icon('info'), document.createTextNode('Prices, hours and availability are estimates. Please check the official website.'));
 
   const saveBtn = $('save');
-  routeEditor({ trip, view: $('details'), editable: true, inert: [$('details-body')], lock: [back, saveBtn] });
+  routeEditor({
+    trip,
+    view: $('details'),
+    editable: true,
+    saveLabel: 'Keep change',
+    savedText: 'Change kept.',
+    inert: [$('details-body')],
+    lock: [back, saveBtn],
+    lockWhilePending: [saveBtn],
+    back,
+  });
 
   saveBtn.addEventListener('click', async () => {
     saveBtn.disabled = true;

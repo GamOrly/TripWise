@@ -1,11 +1,12 @@
 // A route by day, with day-level editing (F9) for the owner. Shared by Trip Details (screen 05) and Trip (screen 08).
-// "Replace activity" on each card opens Edit Activity (screen 06); "Replace whole day" asks first and offers Undo.
+// One change at a time: "Replace activity" (Edit Activity, screen 06) or "Replace whole day" shows the new
+// activities at once, marked "Not saved", and every other replace button waits until the owner saves or discards it.
 // Edit Activity is a state of the page: opening it adds a history entry, so the browser's Back closes it.
 // The day on screen is kept in the address (?day=3), so a reload or the browser's Back returns to the same day.
 // Markup the page provides: #tabs, #day-title, #day-date, #activities, #days-sheet, #activity-sheet, and for editing
-// #replace-day, #day-failed, #edit (Edit Activity) and #confirm-sheet.
+// #replace-day, #day-failed, #pending (the save/discard bar), #edit (Edit Activity), #confirm-sheet and #leave-sheet.
 
-import { getAlternatives, replaceActivity, replaceDay, restoreDay } from './data.js';
+import { getAlternatives, replaceActivity, replaceDay, commitChange, discardChange, shownPlan } from './data.js';
 import { icon } from './icons.js';
 import { showToast, openSheet } from './ui.js';
 import { el, riskChip, thumb, timeRange, dayLabel, activityCard, openActivitySheet, dayTabs } from './render.js';
@@ -13,15 +14,18 @@ import { el, riskChip, thumb, timeRange, dayLabel, activityCard, openActivityShe
 const $ = (id) => document.getElementById(id);
 
 // trip: the trip to show. view: the page's main screen, hidden while Edit Activity is open.
-// editable: whether the cards get "Replace activity". inert: what is locked while a day is being replaced.
-// lock: buttons and links that are disabled meanwhile. onChange(trip): called after each saved change.
-export function routeEditor({ trip, view, editable, inert = [], lock = [], onChange }) {
+// editable: whether the cards get "Replace activity". saveLabel: the save button of the bar
+// ("Save changes to trip" or "Keep change"). inert: what is locked while a day is being replaced.
+// lock: buttons and links that are disabled meanwhile. lockWhilePending: buttons that wait for a change to be
+// saved or discarded ("Save as trip"). back: the page's Back link, which asks first when a change is not saved.
+// onChange(trip): called after each change.
+export function routeEditor({ trip, view, editable, saveLabel, savedText, inert = [], lock = [], lockWhilePending = [], back, onChange }) {
   const params = new URLSearchParams(location.search);
   // ?demo=error: the first attempt of each action fails (like create.html?demo=error).
   const failFirst = { alternatives: params.get('demo') === 'error', day: params.get('demo') === 'error' };
   const activities = $('activities');
   const replaceDayBtn = $('replace-day');
-  const days = () => trip.plan.days;
+  const days = () => shownPlan(trip).days;
   let busy = false;
 
   const changed = (next) => {
@@ -38,6 +42,11 @@ export function routeEditor({ trip, view, editable, inert = [], lock = [], onCha
     history.replaceState(history.state, '', `${location.pathname}?${p}${location.hash}`);
   }
 
+  const isPending = (dayIndex, slot) => {
+    const p = trip.pending;
+    return Boolean(p && p.day === dayIndex && (p.kind === 'day' || p.slot === slot));
+  };
+
   const tabs = dayTabs({
     getDays: days,
     renderDay: (day, dayIndex) => {
@@ -46,7 +55,10 @@ export function routeEditor({ trip, view, editable, inert = [], lock = [], onCha
       activities.replaceChildren(...day.activities.map((a, slot) => activityCard(a, {
         onOpen: () => openActivitySheet(a, day),
         onReplace: editable ? () => openEdit(dayIndex, slot) : undefined,
+        pending: editable && isPending(dayIndex, slot),
+        locked: Boolean(trip.pending),
       })));
+      if (editable) paintPending();
     },
   });
 
@@ -54,7 +66,9 @@ export function routeEditor({ trip, view, editable, inert = [], lock = [], onCha
   const cardPart = (slot, part) => activities.children[slot]?.querySelector(part === 'replace' ? '.tw-activity__replace' : '.tw-activity__main');
 
   const askedDay = Number(params.get('day')) - 1;
-  const firstDay = Number.isInteger(askedDay) && askedDay >= 0 && askedDay < days().length ? askedDay : 0;
+  const urlDay = Number.isInteger(askedDay) && askedDay >= 0 && askedDay < days().length ? askedDay : 0;
+  // A change waiting to be saved: open on its day.
+  const firstDay = editable && trip.pending ? trip.pending.day : urlDay;
 
   if (!editable) {
     if (replaceDayBtn) replaceDayBtn.hidden = true;
@@ -66,11 +80,56 @@ export function routeEditor({ trip, view, editable, inert = [], lock = [], onCha
   $('day-failed-icon').appendChild(icon('alert'));
   $('alt-failed-icon').appendChild(icon('alert'));
   $('alt-retry').append(icon('replace', { size: 'md' }), document.createTextNode('Try again'));
+  $('pending-save').textContent = saveLabel;
+
+  // ---------- The change waiting to be saved ----------
+
+  function paintPending() {
+    const p = trip.pending;
+    $('pending').hidden = !p;
+    replaceDayBtn.disabled = busy || Boolean(p);
+    for (const node of lockWhilePending) node.disabled = Boolean(p);
+    if (!p) return;
+    const dayNumber = trip.plan.days[p.day].day_number;
+    $('pending-text').textContent = p.kind === 'activity'
+      ? `Day ${dayNumber}: ${trip.plan.days[p.day].activities[p.slot].name} → ${p.activities[0].name}`
+      : `Day ${dayNumber}: all ${p.activities.length} activities replaced`;
+  }
+
+  // After saving or discarding: the day of the change, with focus on its card.
+  function settle(dayIndex, slot, message) {
+    tabs.select(dayIndex);
+    (slot === undefined ? $('day-title') : cardPart(slot, 'main'))?.focus();
+    showToast(message);
+  }
+
+  $('pending-save').addEventListener('click', async () => {
+    const { day, slot } = trip.pending;
+    changed(await commitChange(trip.id));
+    settle(day, slot, savedText);
+  });
+
+  $('pending-discard').addEventListener('click', async () => {
+    const { day, slot } = trip.pending;
+    changed(await discardChange(trip.id));
+    settle(day, slot, 'Change discarded.');
+  });
+
+  // The page's Back link: leaving with a change that is not saved asks first; "Leave" discards it.
+  back?.addEventListener('click', (e) => {
+    if (!trip.pending) return;
+    e.preventDefault();
+    const close = openSheet($('leave-sheet'));
+    $('leave').onclick = async () => {
+      close();
+      changed(await discardChange(trip.id));
+      location.href = back.href;
+    };
+  });
 
   // ---------- Replace whole day ----------
 
   function setDayButton(state) {
-    replaceDayBtn.disabled = state === 'busy';
     if (state === 'busy') {
       replaceDayBtn.replaceChildren(el('span', 'tw-spinner'), document.createTextNode('Replacing day…'));
     } else if (state === 'retry') {
@@ -93,6 +152,7 @@ export function routeEditor({ trip, view, editable, inert = [], lock = [], onCha
         node.disabled = on;
       }
     }
+    paintPending();
   }
 
   function hideDayError() {
@@ -101,13 +161,14 @@ export function routeEditor({ trip, view, editable, inert = [], lock = [], onCha
   }
 
   replaceDayBtn.addEventListener('click', () => {
+    if (trip.pending) return;
     if (!$('day-failed').hidden) {
       runReplaceDay();
       return;
     }
     const day = days()[tabs.current()];
     $('confirm-title').textContent = `Replace Day ${day.day_number}?`;
-    $('confirm-text').textContent = `All ${day.activities.length} activities of ${dayLabel(day)} will be replaced with new ones. The other days stay the same.`;
+    $('confirm-text').textContent = `All ${day.activities.length} activities of ${dayLabel(day)} will be replaced with new ones. You can save or discard the new day.`;
     const close = openSheet($('confirm-sheet'));
     $('confirm-day').onclick = () => {
       close();
@@ -117,31 +178,17 @@ export function routeEditor({ trip, view, editable, inert = [], lock = [], onCha
 
   async function runReplaceDay() {
     const dayIndex = tabs.current();
-    const dayNumber = days()[dayIndex].day_number;
     $('day-failed').hidden = true;
     setBusy(true);
     setDayButton('busy');
     try {
       const fail = failFirst.day;
       failFirst.day = false;
-      const result = await replaceDay(trip.id, dayIndex, { fail });
-      changed(result.trip);
+      changed(await replaceDay(trip.id, dayIndex, { fail }));
       setBusy(false);
       setDayButton('idle');
       tabs.select(dayIndex);
-      $('day-title').focus();
-      showToast(`Day ${dayNumber} replaced.`, {
-        duration: 6000,
-        action: {
-          text: 'Undo',
-          onClick: async () => {
-            changed(await restoreDay(trip.id, dayIndex, result.previous));
-            tabs.select(dayIndex);
-            $('day-title').focus();
-            showToast(`Day ${dayNumber} is back as it was.`);
-          },
-        },
-      });
+      $('pending-save').focus();
     } catch (err) {
       setBusy(false);
       $('day-failed-text').textContent = err.message === 'No more new activities for this day.'
@@ -211,7 +258,7 @@ export function routeEditor({ trip, view, editable, inert = [], lock = [], onCha
   }
 
   function openEdit(dayIndex, slot) {
-    if (busy) return;
+    if (busy || trip.pending) return;
     viewScroll = window.scrollY;
     picking = { dayIndex, slot, options: null };
     afterClose = () => cardPart(slot, 'replace')?.focus();
@@ -250,9 +297,9 @@ export function routeEditor({ trip, view, editable, inert = [], lock = [], onCha
     if (!edit.hidden) closeEditView();
   });
 
-  const back = () => history.back();
-  $('edit-back').addEventListener('click', back);
-  $('cancel').addEventListener('click', back);
+  const closeEdit = () => history.back();
+  $('edit-back').addEventListener('click', closeEdit);
+  $('cancel').addEventListener('click', closeEdit);
   $('alt-retry').addEventListener('click', loadAlternatives);
 
   replaceBtn.addEventListener('click', async () => {
@@ -268,12 +315,9 @@ export function routeEditor({ trip, view, editable, inert = [], lock = [], onCha
       $('alt-failed').hidden = false;
       return;
     }
-    // The same day as before, with the new activity in its place.
+    // The same day as before, with the new activity in its place, waiting to be saved or discarded.
     tabs.select(dayIndex);
-    afterClose = () => {
-      cardPart(slot, 'main')?.focus();
-      showToast('Activity replaced.');
-    };
+    afterClose = () => cardPart(slot, 'main')?.focus();
     history.back();
   });
 

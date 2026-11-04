@@ -43,24 +43,29 @@ export function thumb(activity, alt = activity.name) {
 export const timeRange = (a) => `${a.start_time} – ${a.end_time}`;
 export const dayLabel = (day) => `Day ${day.day_number} – ${day.city}`;
 
-// An activity card. The top part opens the details; with `onReplace` it also gets the "Replace activity" bar (Trip Details).
-export function activityCard(a, { onOpen, onReplace } = {}) {
-  const card = el('article', 'tw-activity');
+// An activity card. The top part opens the details; with `onReplace` it also gets the "Replace activity" bar.
+// `pending`: the card shows a replacement that is not saved yet. `locked`: the bar is there but not available.
+export function activityCard(a, { onOpen, onReplace, pending = false, locked = false } = {}) {
+  const card = el('article', pending ? 'tw-activity is-pending' : 'tw-activity');
   const main = el('button', 'tw-activity__main');
   main.type = 'button';
-  main.setAttribute('aria-label', `${a.name}, details`);
   const text = el('div', 'tw-activity__text');
   const top = el('div', 'tw-activity__top');
   top.appendChild(el('span', 'tw-activity__time', timeRange(a)));
+  const chips = el('span', 'tw-activity__chips');
+  if (pending) chips.appendChild(el('span', 'tw-chip tw-chip--sm tw-chip--warning', 'Not saved'));
   const chip = riskChip(a);
-  if (chip) top.appendChild(chip);
+  if (chip) chips.appendChild(chip);
+  if (chips.children.length) top.appendChild(chips);
   text.append(top, el('span', 'tw-activity__name', a.name), el('span', 'tw-activity__why', a.reason));
   main.append(thumb(a), text, icon('chevron-right'));
+  main.setAttribute('aria-label', pending ? `${a.name}, not saved, details` : `${a.name}, details`);
   main.addEventListener('click', () => onOpen?.(a));
   card.appendChild(main);
   if (onReplace) {
     const replace = el('button', 'tw-activity__replace');
     replace.type = 'button';
+    replace.disabled = locked;
     replace.setAttribute('aria-label', `Replace ${a.name}`);
     replace.append(icon('replace', { size: 'md' }), document.createTextNode('Replace activity'));
     replace.addEventListener('click', () => onReplace(a));
