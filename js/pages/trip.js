@@ -1,11 +1,16 @@
-// Trip (screens 08 and 13): the itinerary by day, read-only. The owner also gets the Shared switch.
+// Trip (screens 08 and 13): the itinerary by day. The owner also gets the Shared switch and, while the trip has not
+// ended, "Replace activity" and "Replace whole day" (editor.js), saved right away. A visitor with the link only reads.
 // Flights, hotels and notes come in milestone 5.
 
-import { getTripForViewing, saveTrip, tripName } from '../data.js';
-import { formatRange, tripTiming } from '../dates.js';
+import { getTripForViewing, saveTrip, tripName, canEdit } from '../data.js';
+import { formatRange } from '../dates.js';
 import { icon } from '../icons.js';
-import { activityCard, openActivitySheet, dayTabs } from '../render.js';
-import { showToast } from '../ui.js';
+import { routeEditor } from '../editor.js';
+
+// Back to this page from the browser cache: load it again, so it never shows a route from before a change.
+window.addEventListener('pageshow', (e) => {
+  if (e.persisted) location.reload();
+});
 
 const found = await getTripForViewing(new URLSearchParams(location.search).get('id') || '');
 
@@ -16,7 +21,6 @@ if (!found || !found.trip.plan) {
 } else {
   let { trip } = found;
   const owner = found.mode === 'owner';
-  const days = trip.plan.days;
 
   document.title = `${tripName(trip)} · Tripwise`;
   document.getElementById('name').textContent = tripName(trip);
@@ -44,28 +48,15 @@ if (!found || !found.trip.plan) {
     document.getElementById('share').hidden = true;
   }
 
-  // Edit route (owner only, not for past trips): the day-level editing of Trip Details, saved with "Save changes".
-  const editRoute = document.getElementById('edit-route');
-  if (editRoute && owner && tripTiming(trip) !== 'past') {
-    editRoute.href = `plan.html?id=${encodeURIComponent(trip.id)}&edit=1`;
-    editRoute.append(icon('replace', { size: 'md' }), document.createTextNode('Edit route'));
-    editRoute.hidden = false;
-  }
-
-  const activities = document.getElementById('activities');
-  const tabs = dayTabs({
-    getDays: () => days,
-    renderDay: (day) => {
-      activities.replaceChildren(...day.activities.map((a) => activityCard(a, { onOpen: () => openActivitySheet(a, day) })));
+  routeEditor({
+    trip,
+    view: document.getElementById('trip'),
+    editable: owner && canEdit(trip),
+    inert: [document.getElementById('tabs'), document.getElementById('activities'), share],
+    lock: [back],
+    onChange: (next) => {
+      trip = next;
     },
   });
-  tabs.select(0);
   document.getElementById('trip').hidden = false;
-
-  // trip.html?id=…&changes=saved, right after "Save changes" on Edit route.
-  const params = new URLSearchParams(location.search);
-  if (params.get('changes') === 'saved') {
-    history.replaceState(null, '', `${location.pathname}?id=${encodeURIComponent(trip.id)}`);
-    showToast('Changes saved.');
-  }
 }

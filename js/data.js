@@ -4,14 +4,14 @@
 //
 // A trip has the shape of a row in the `trips` table (spec/ARCHITECTURE.md 4.1).
 // Demo-only additions, to be settled with the backend: day.city, activity.start_time,
-// activity.end_time, activity.image, route.cities, route.highlights, route.image, `avoid` (names of the activities
-// the owner replaced, so they are not offered again) and a saved trip's `edit_plan` (the route while it is edited).
+// activity.end_time, activity.image, route.cities, route.highlights, route.image, and `avoid` (names of the
+// activities the owner replaced, oldest first, so they are offered again only when nothing else is left).
 
-import { todayISO, addDays, daysBetween, dayCount } from './dates.js';
+import { todayISO, addDays, daysBetween, dayCount, tripTiming } from './dates.js';
 
 const STORE_KEY = 'tripwise.demo.v1';
 // Bump when the demo data itself changes (new photos, new trips): saved demo data from older versions is rebuilt.
-const SEED_VERSION = 4;
+const SEED_VERSION = 5;
 const SESSION_KEY = 'tripwise.session.v1';
 const OWNER_ID = '00000000-0000-4000-8000-000000000001';
 
@@ -111,11 +111,29 @@ const ACTIVITIES = {
     { name: 'Acropolis Archaeological Park', reason: 'Suitable for ages 4 and up, a short walk, and open views.', risk_label: 'rough_terrain', min_age: 4, notes: 'Estimated entry 20–30 EUR. Please check the official website.', image: 'img/activity-acropolis.jpg' },
     { name: 'Plaka Neighbourhood', reason: 'Car-free lanes with shade and cafés.', risk_label: 'none', min_age: 0, image: 'img/activity-plaka.jpg' },
     { name: 'National Garden', reason: 'A shaded park with a small playground.', risk_label: 'none', min_age: 0, image: 'img/activity-garden.jpg' },
+    { name: 'Acropolis Museum', reason: 'Bright, air-conditioned halls with a glass floor over old ruins.', risk_label: 'none', min_age: 0, image: 'img/activity-acropolis-museum.jpg' },
+    { name: 'Ancient Agora of Athens', reason: 'Open ruins with shady paths and a well-kept temple.', risk_label: 'none', min_age: 0, image: 'img/activity-ancient-agora-of-athens.jpg' },
+    { name: 'Temple of Olympian Zeus', reason: 'Giant columns, seen in a short, flat walk.', risk_label: 'none', min_age: 0, image: 'img/activity-temple-of-olympian-zeus.jpg' },
+    { name: 'Panathenaic Stadium', reason: 'A marble stadium where children can run a lap.', risk_label: 'none', min_age: 0, image: 'img/activity-panathenaic-stadium.jpg' },
+    { name: 'Lycabettus Hill Funicular', reason: 'A short funicular ride to the best view of the city.', risk_label: 'none', min_age: 0, image: 'img/activity-lycabettus-hill-funicular.jpg' },
+    { name: 'Stavros Niarchos Park', reason: 'A large green park with fountains, a canal and play areas.', risk_label: 'none', min_age: 0, image: 'img/activity-stavros-niarchos-park.jpg' },
+    { name: 'Changing of the Guard', reason: 'The guards in traditional uniform, every hour at Syntagma Square.', risk_label: 'none', min_age: 0, image: 'img/activity-changing-of-the-guard.jpg' },
+    { name: 'Attica Zoological Park', reason: 'A zoo with Greek wildlife, birds and a dolphin show.', risk_label: 'none', min_age: 0, image: 'img/activity-attica-zoological-park.jpg' },
+    { name: 'National Archaeological Museum', reason: 'Gold masks and statues, best seen in a short family route.', risk_label: 'none', min_age: 4, image: 'img/activity-national-archaeological-museum.jpg' },
   ],
   'Crete': [
     { name: 'Elafonisi Beach', reason: 'Shallow, warm water that suits young children.', risk_label: 'none', min_age: 0, image: 'img/activity-elafonisi.jpg' },
     { name: 'Knossos Palace', reason: 'An easy archaeological site with clear paths.', risk_label: 'none', min_age: 0, image: 'img/activity-knossos.jpg' },
-    { name: 'Samaria Gorge (lower part)', reason: 'A short walk into the gorge from Agia Roumeli.', risk_label: 'rough_terrain', min_age: 8 },
+    { name: 'Samaria Gorge (lower part)', reason: 'A short walk into the gorge from Agia Roumeli.', risk_label: 'rough_terrain', min_age: 8, image: 'img/activity-samaria-gorge-lower-part.jpg' },
+    { name: 'Heraklion Archaeological Museum', reason: 'Colourful Minoan frescoes and treasures from Knossos.', risk_label: 'none', min_age: 0, image: 'img/activity-heraklion-archaeological-museum.jpg' },
+    { name: 'CretAquarium', reason: 'An indoor aquarium with sharks, turtles and local sea life.', risk_label: 'none', min_age: 0, image: 'img/activity-cretaquarium.jpg' },
+    { name: 'Chania Venetian Harbour', reason: 'An evening stroll along the old harbour and lighthouse.', risk_label: 'other', min_age: 0, notes: 'The harbour edge has no railing. Keep small children close.', image: 'img/activity-chania-venetian-harbour.jpg' },
+    { name: 'Balos Lagoon', reason: 'Turquoise shallow water, reached by a boat trip.', risk_label: 'deep_water', min_age: 0, image: 'img/activity-balos-lagoon.jpg' },
+    { name: 'Spinalonga Island', reason: 'A short boat ride to an island fortress with easy paths.', risk_label: 'deep_water', min_age: 0, image: 'img/activity-spinalonga-island.jpg' },
+    { name: 'Fortezza of Rethymno', reason: 'A Venetian fortress on a hill with sea views.', risk_label: 'none', min_age: 0, image: 'img/activity-fortezza-of-rethymno.jpg' },
+    { name: 'Phaistos Palace', reason: 'A Minoan palace on a hill, with open views of the plain.', risk_label: 'none', min_age: 0, image: 'img/activity-phaistos-palace.jpg' },
+    { name: 'Arkadi Monastery', reason: 'A historic monastery with a quiet courtyard.', risk_label: 'none', min_age: 0, image: 'img/activity-arkadi-monastery.jpg' },
+    { name: 'Preveli Beach', reason: 'A palm-lined beach where a river meets the sea.', risk_label: 'rough_terrain', min_age: 4, notes: 'Steps lead down to the beach.', image: 'img/activity-preveli-beach.jpg' },
   ],
   'Rome': [
     { name: 'Colosseum', reason: 'The most famous site in Rome, with a family audio guide.', risk_label: 'none', min_age: 0 },
@@ -138,14 +156,32 @@ const ACTIVITIES = {
     { name: 'Royal Palace', reason: 'Grand rooms and the changing of the guard.', risk_label: 'none', min_age: 0 },
   ],
   'Utah': [
-    { name: 'Zion Riverside Walk', reason: 'A paved, flat trail along the river.', risk_label: 'none', min_age: 0 },
-    { name: 'Bryce Canyon Rim Trail', reason: 'Easy rim views of the hoodoos.', risk_label: 'rough_terrain', min_age: 4 },
-    { name: 'Junior Ranger Program', reason: 'Activity booklets and a badge for children.', risk_label: 'none', min_age: 4 },
+    { name: 'Zion Riverside Walk', reason: 'A paved, flat trail along the river.', risk_label: 'none', min_age: 0, image: 'img/activity-zion-riverside-walk.jpg' },
+    { name: 'Bryce Canyon Rim Trail', reason: 'Easy rim views of the hoodoos.', risk_label: 'rough_terrain', min_age: 4, image: 'img/activity-bryce-canyon-rim-trail.jpg' },
+    { name: 'Junior Ranger Program', reason: 'Activity booklets and a badge for children.', risk_label: 'none', min_age: 4, image: 'img/activity-junior-ranger-program.jpg' },
+    { name: 'Zion Canyon Shuttle', reason: 'A free shuttle ride with stops at the main viewpoints.', risk_label: 'none', min_age: 0, image: 'img/activity-zion-canyon-shuttle.jpg' },
+    { name: 'Emerald Pools Trail', reason: 'A short trail to pools and small waterfalls.', risk_label: 'rough_terrain', min_age: 6, image: 'img/activity-emerald-pools-trail.jpg' },
+    { name: 'Sunset Point', reason: 'A famous viewpoint over the hoodoos, a few steps from the car.', risk_label: 'none', min_age: 0, image: 'img/activity-sunset-point.jpg' },
+    { name: 'Kolob Canyons', reason: 'A scenic drive through red canyons with quiet viewpoints.', risk_label: 'none', min_age: 0, image: 'img/activity-kolob-canyons.jpg' },
+    { name: 'Red Canyon', reason: 'Red rock tunnels and an easy paved bike path.', risk_label: 'none', min_age: 0, image: 'img/activity-red-canyon.jpg' },
+    { name: 'Coral Pink Sand Dunes', reason: 'Pink sand dunes to climb and slide down.', risk_label: 'none', min_age: 0, image: 'img/activity-coral-pink-sand-dunes.jpg' },
+    { name: 'Kodachrome Basin', reason: 'Colourful rock spires along short, flat trails.', risk_label: 'none', min_age: 0, image: 'img/activity-kodachrome-basin.jpg' },
+    { name: 'Snow Canyon State Park', reason: 'Lava tubes and red sand on easy family trails.', risk_label: 'rough_terrain', min_age: 6, image: 'img/activity-snow-canyon-state-park.jpg' },
+    { name: 'Capitol Reef Orchards', reason: 'Historic orchards where families can pick fruit in season.', risk_label: 'none', min_age: 0, image: 'img/activity-capitol-reef-orchards.jpg' },
   ],
   'Arizona': [
-    { name: 'Grand Canyon South Rim', reason: 'Paved viewpoints with shuttle buses between them.', risk_label: 'none', min_age: 0 },
-    { name: 'Horseshoe Bend', reason: 'A short walk to a famous viewpoint; no railings at the edge.', risk_label: 'other', min_age: 6 },
-    { name: 'Antelope Canyon (guided)', reason: 'A guided walk through a narrow sandstone canyon.', risk_label: 'none', min_age: 0 },
+    { name: 'Grand Canyon South Rim', reason: 'Paved viewpoints with shuttle buses between them.', risk_label: 'none', min_age: 0, image: 'img/activity-grand-canyon-south-rim.jpg' },
+    { name: 'Horseshoe Bend', reason: 'A short walk to a famous viewpoint; no railings at the edge.', risk_label: 'other', min_age: 6, image: 'img/activity-horseshoe-bend.jpg' },
+    { name: 'Antelope Canyon (guided)', reason: 'A guided walk through a narrow sandstone canyon.', risk_label: 'none', min_age: 0, image: 'img/activity-antelope-canyon-guided.jpg' },
+    { name: 'Desert View Watchtower', reason: 'A stone tower with painted walls and a wide canyon view.', risk_label: 'none', min_age: 0, image: 'img/activity-desert-view-watchtower.jpg' },
+    { name: 'Grand Canyon Railway', reason: 'A historic train ride to the canyon, with a show on board.', risk_label: 'none', min_age: 0, image: 'img/activity-grand-canyon-railway.jpg' },
+    { name: 'Bearizona Wildlife Park', reason: 'A drive-through park with bears, wolves and bison.', risk_label: 'none', min_age: 0, image: 'img/activity-bearizona-wildlife-park.jpg' },
+    { name: 'Glen Canyon Dam Overlook', reason: 'A short walk to a view of the dam and the river.', risk_label: 'other', min_age: 0, image: 'img/activity-glen-canyon-dam-overlook.jpg' },
+    { name: 'Monument Valley', reason: 'Famous red buttes, seen on a guided jeep tour.', risk_label: 'none', min_age: 0, image: 'img/activity-monument-valley.jpg' },
+    { name: 'Petrified Forest', reason: 'Logs turned to stone along short, paved trails.', risk_label: 'none', min_age: 0, image: 'img/activity-petrified-forest.jpg' },
+    { name: 'Meteor Crater', reason: 'A huge crater with a museum and a viewing deck.', risk_label: 'none', min_age: 0, image: 'img/activity-meteor-crater.jpg' },
+    { name: 'Slide Rock State Park', reason: 'A natural water slide in a creek; best for good swimmers.', risk_label: 'deep_water', min_age: 6, image: 'img/activity-slide-rock-state-park.jpg' },
+    { name: 'Montezuma Castle', reason: 'Cliff dwellings seen from a short, flat loop.', risk_label: 'none', min_age: 0, image: 'img/activity-montezuma-castle.jpg' },
   ],
 };
 
@@ -333,7 +369,6 @@ function shiftTrip(t, days) {
     start_date: s(t.start_date),
     end_date: s(t.end_date),
     plan: shiftRoute(t.plan),
-    edit_plan: shiftRoute(t.edit_plan),
     routes: t.routes && t.routes.map(shiftRoute),
     flights: t.flights && Object.fromEntries(Object.entries(t.flights).map(([k, f]) => [k, f && { ...f, date: s(f.date) }])),
     hotels: t.hotels && t.hotels.map((h) => ({ ...h, check_in: s(h.check_in), check_out: s(h.check_out) })),
@@ -499,32 +534,37 @@ export async function generateRoutes(input, { fail = false } = {}) {
 
 const youngestChild = (t) => (t.has_children && t.children_ages?.length ? Math.min(...t.children_ages) : Infinity);
 
-// The trip a Trip Details screen works on: a draft with a chosen route, or a saved trip being edited
-// ("Edit route"). Throws when there is none.
+// Whether the owner may change a trip's activities: a draft with a chosen route (Trip Details), or a saved trip
+// that has not ended yet (the Trip screen). Changes to a saved trip are saved right away.
+export function canEdit(t) {
+  if (!t?.plan) return false;
+  if (t.status === 'draft') return t.selected_route != null;
+  return t.status === 'saved' && tripTiming(t) !== 'past';
+}
+
+// The trip being edited. Throws when it is missing or may not be changed.
 function editableTrip(state, id) {
   const t = state.trips.find((x) => x.id === id);
-  if (!t || !workPlan(t)) throw new Error('This trip is not available.');
+  if (!canEdit(t)) throw new Error('This trip is not available.');
   return t;
 }
 
-// The route that editing changes: a draft's plan, or a saved trip's working copy (the saved plan stays as it is until
-// "Save changes", so the Trip screen and shared links do not show unsaved edits).
-const workPlan = (t) => (t.status === 'draft' ? t.plan : t.status === 'saved' ? t.edit_plan : null);
-
 // Up to `count` activities that may go into day `dayIndex`. Never one already in that day, the day before or the
-// day after, one the owner replaced before (`avoid`), or one above the youngest child's age.
-// Activities that are not anywhere in the route come first; others only fill the gap.
+// day after, or one above the youngest child's age. So that replacing never runs out, the order is:
+// activities that are nowhere in the route, then ones on a day further away, then ones the owner replaced before
+// (`avoid`), the one replaced longest ago first.
 function alternativesFor(t, dayIndex, count) {
-  const days = workPlan(t).days;
+  const days = t.plan.days;
   const names = (i) => (days[i] ? days[i].activities.map((a) => a.name) : []);
   const locked = new Set([...names(dayIndex - 1), ...names(dayIndex), ...names(dayIndex + 1)]);
-  const avoid = new Set(t.avoid || []);
+  const avoid = t.avoid || [];
   const inRoute = new Set(days.flatMap((d) => d.activities.map((a) => a.name)));
-  const allowed = (ACTIVITIES[days[dayIndex].city] || [])
-    .filter((a) => a.min_age <= youngestChild(t) && !locked.has(a.name) && !avoid.has(a.name));
-  return [...allowed.filter((a) => !inRoute.has(a.name)), ...allowed.filter((a) => inRoute.has(a.name))]
-    .slice(0, count)
-    .map(clone);
+  const allowed = (ACTIVITIES[days[dayIndex].city] || []).filter((a) => a.min_age <= youngestChild(t) && !locked.has(a.name));
+  const replaced = (a) => avoid.includes(a.name);
+  const fresh = allowed.filter((a) => !replaced(a) && !inRoute.has(a.name));
+  const elsewhere = allowed.filter((a) => !replaced(a) && inRoute.has(a.name));
+  const again = allowed.filter(replaced).sort((a, b) => avoid.lastIndexOf(a.name) - avoid.lastIndexOf(b.name));
+  return [...fresh, ...elsewhere, ...again].slice(0, count).map(clone);
 }
 
 // "View route" on Choose Your Route: the chosen option becomes the draft's plan.
@@ -542,7 +582,7 @@ export async function selectRoute(id, index) {
   return clone(t);
 }
 
-// Edit Activity: 3 new activities for day `dayIndex` (fewer when the city has run out of them).
+// Edit Activity: 3 activities for day `dayIndex` (fewer only when the city has fewer than that to offer).
 export async function getAlternatives(id, dayIndex, { fail = false } = {}) {
   await wait(1000);
   if (fail) throw new Error("We couldn't find new activities. Please try again.");
@@ -553,13 +593,13 @@ export async function getAlternatives(id, dayIndex, { fail = false } = {}) {
 export async function replaceActivity(id, dayIndex, slot, activity) {
   const state = load();
   const t = editableTrip(state, id);
-  const day = workPlan(t).days[dayIndex];
+  const day = t.plan.days[dayIndex];
   const old = day.activities[slot];
   // Checked in code, like a model answer: it must still be allowed for this day.
   const allowed = alternativesFor(t, dayIndex, Infinity).find((a) => a.name === activity.name);
   if (!allowed) throw new Error("We couldn't replace the activity. Please try again.");
   day.activities[slot] = { ...allowed, start_time: old.start_time, end_time: old.end_time };
-  t.avoid = [...(t.avoid || []), old.name];
+  t.avoid = [...(t.avoid || []).filter((name) => name !== old.name), old.name];
   save(state);
   return clone(t);
 }
@@ -570,12 +610,13 @@ export async function replaceDay(id, dayIndex, { fail = false } = {}) {
   if (fail) throw new Error("We couldn't replace the day. Please try again.");
   const state = load();
   const t = editableTrip(state, id);
-  const day = workPlan(t).days[dayIndex];
+  const day = t.plan.days[dayIndex];
   const fresh = alternativesFor(t, dayIndex, day.activities.length);
   if (fresh.length < day.activities.length) throw new Error('No more new activities for this day.');
   const previous = clone(day);
   day.activities = day.activities.map((old, i) => ({ ...fresh[i], start_time: old.start_time, end_time: old.end_time }));
-  t.avoid = [...(t.avoid || []), ...previous.activities.map((a) => a.name)];
+  const out = previous.activities.map((a) => a.name);
+  t.avoid = [...(t.avoid || []).filter((name) => !out.includes(name)), ...out];
   save(state);
   return { trip: clone(t), previous };
 }
@@ -584,7 +625,7 @@ export async function replaceDay(id, dayIndex, { fail = false } = {}) {
 export async function restoreDay(id, dayIndex, previous) {
   const state = load();
   const t = editableTrip(state, id);
-  workPlan(t).days[dayIndex] = clone(previous);
+  t.plan.days[dayIndex] = clone(previous);
   const back = new Set(previous.activities.map((a) => a.name));
   t.avoid = (t.avoid || []).filter((name) => !back.has(name));
   save(state);
@@ -600,41 +641,6 @@ export async function saveAsTrip(id) {
   delete t.avoid;
   save(state);
   return clone(t);
-}
-
-// "Edit route" on the Trip screen: starts a working copy of a saved trip's plan, or continues the one in progress.
-export async function startEditing(id) {
-  const state = load();
-  const t = state.trips.find((x) => x.id === id);
-  if (!t || t.status !== 'saved' || !t.plan) throw new Error('This trip is not available.');
-  if (!t.edit_plan) {
-    t.edit_plan = clone(t.plan);
-    t.avoid = [];
-    save(state);
-  }
-  return clone(t);
-}
-
-// "Save changes": the working copy becomes the trip's plan.
-export async function saveChanges(id) {
-  const state = load();
-  const t = editableTrip(state, id);
-  if (t.status !== 'saved') throw new Error('This trip is not available.');
-  t.plan = t.edit_plan;
-  delete t.edit_plan;
-  delete t.avoid;
-  save(state);
-  return clone(t);
-}
-
-// "Leave" without saving: the working copy is dropped, and the trip stays as it was saved.
-export async function discardChanges(id) {
-  const state = load();
-  const t = state.trips.find((x) => x.id === id);
-  if (!t) return;
-  delete t.edit_plan;
-  delete t.avoid;
-  save(state);
 }
 
 export async function resetDemo() {

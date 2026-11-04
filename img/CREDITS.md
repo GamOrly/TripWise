@@ -60,4 +60,48 @@ Each one is used under the licence shown; follow the link for the original file 
 | `activity-santa-maria-bay-cruise.jpg` | Santa Maria Bay Cruise | 663highland | CC BY 2.5 | https://commons.wikimedia.org/wiki/File:Osaka_Santa_Maria02n3872.jpg |
 | `activity-tennoji-zoo.jpg` | Tennoji Zoo | No machine-readable author provided. Fk assumed (based on copyright claims). | CC BY-SA 2.5 | https://commons.wikimedia.org/wiki/File:Tennoji_zoo_nzabi.jpg |
 
+| `activity-samaria-gorge-lower-part.jpg` | Samaria Gorge (lower part) | C messier | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:%CE%A6%CE%B1%CF%81%CE%AC%CE%B3%CE%B3%CE%B9_%CE%A3%CE%B1%CE%BC%CE%B1%CF%81%CE%B9%CE%AC%CF%82_3754.jpg |
+| `activity-acropolis-museum.jpg` | Acropolis Museum | Bandelmug | CC BY 4.0 | https://commons.wikimedia.org/wiki/File:Acropolis_Museum_Interior.jpg |
+| `activity-ancient-agora-of-athens.jpg` | Ancient Agora of Athens | Chabe01 | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Agora_-_Ath%C3%A8nes_(GRA1)_-_2022-03-26_-_97.jpg |
+| `activity-temple-of-olympian-zeus.jpg` | Temple of Olympian Zeus | Jean-Pierre Dalbéra from Paris, France | CC BY 2.0 | https://commons.wikimedia.org/wiki/File:L%27Olympieion_(Ath%C3%A8nes)_(30776483926).jpg |
+| `activity-panathenaic-stadium.jpg` | Panathenaic Stadium | Mister No | CC BY 3.0 | https://commons.wikimedia.org/wiki/File:Panathenaic_Stadium_-_panoramio_(1).jpg |
+| `activity-lycabettus-hill-funicular.jpg` | Lycabettus Hill Funicular | Apaleutos25 | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:%CE%9B%CF%85%CE%BA%CE%B1%CE%B2%CE%B7%CF%84%CF%84%CF%8C%CF%82_-_Mount_Lycabettus.jpg |
+| `activity-stavros-niarchos-park.jpg` | Stavros Niarchos Park | John Karakatsanis | CC BY-SA 2.0 | https://commons.wikimedia.org/wiki/File:Stavros_Niarchos_Foundation_Cultural_Center_-_24188920906.jpg |
+| `activity-changing-of-the-guard.jpg` | Changing of the Guard | George E. Koronaios | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Members_of_the_Greek_Presidential_Guard_(Evzones)_at_the_Tomb_of_the_Unknown_Soldier.jpg |
+| `activity-attica-zoological-park.jpg` | Attica Zoological Park | ΖῷονΠολιτικόν | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Swans_in_Attica_Zoological_Park.jpg |
+| `activity-national-archaeological-museum.jpg` | National Archaeological Museum | Thomas Wolf, www.foto-tw.de | CC BY-SA 3.0 de | https://commons.wikimedia.org/wiki/File:Arch%C3%A4ologisches_Nationalmuseum_Athen.jpg |
+| `activity-heraklion-archaeological-museum.jpg` | Heraklion Archaeological Museum | Olaf Tausch | CC BY 3.0 | https://commons.wikimedia.org/wiki/File:Stierspringer-Elfenbeinstatuette_Knossos_01.jpg |
+| `activity-cretaquarium.jpg` | CretAquarium | Lourakis | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:Cretaquarium_entrance.jpg |
+| `activity-chania-venetian-harbour.jpg` | Chania Venetian Harbour | Ввласенко | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:Harbor,_Venetian_shipyards_and_Lighthouse_in_Chania._Crete,_Greece.jpg |
+| `activity-balos-lagoon.jpg` | Balos Lagoon | Michael Brys | CC BY 2.0 | https://commons.wikimedia.org/wiki/File:Imeri_Gramvousa.jpg |
+| `activity-spinalonga-island.jpg` | Spinalonga Island | Ggia | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:20090620_Spinalogka_Elounta_panoramic_view_from_the_mountain.jpg |
+| `activity-fortezza-of-rethymno.jpg` | Fortezza of Rethymno | Olaf Tausch | CC BY 3.0 | https://commons.wikimedia.org/wiki/File:Rethymno_Fortezza_47.JPG |
+| `activity-phaistos-palace.jpg` | Phaistos Palace | Jebulon | CC0 | https://commons.wikimedia.org/wiki/File:Central_courtyard_Phaistos_palace_Crete.jpg |
+| `activity-arkadi-monastery.jpg` | Arkadi Monastery | Parisdent | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Arkadi_monastery-2.jpg |
+| `activity-preveli-beach.jpg` | Preveli Beach | Creteman | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Plakias-Preveli_beach.jpg |
+| `activity-zion-riverside-walk.jpg` | Zion Riverside Walk | McGhiever | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:Riverside_Walk,_Zion_NP.JPG |
+| `activity-bryce-canyon-rim-trail.jpg` | Bryce Canyon Rim Trail | King of Hearts | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Inspiration_Point_Bryce_Canyon_November_2018_panorama.jpg |
+| `activity-junior-ranger-program.jpg` | Junior Ranger Program | NPS / Jonathan Shafer | Public domain | https://commons.wikimedia.org/wiki/File:Ranger_at_Zion_Canyon_Visitor_Center_with_junior_rangers_(b2b80a43-51d5-4623-92a5-de85707810bb).jpg |
+| `activity-zion-canyon-shuttle.jpg` | Zion Canyon Shuttle | Bill Golladay | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Shuttle_bus_stop_at_Zion_Canyon_National_Park.jpg |
+| `activity-emerald-pools-trail.jpg` | Emerald Pools Trail | Bentatree | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Emerald_Pools_Color.jpg |
+| `activity-sunset-point.jpg` | Sunset Point | “Jon Zander(digon3)” | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:Bryce_Canyon_Hoodoos.jpg |
+| `activity-kolob-canyons.jpg` | Kolob Canyons | ZionNPS | Public domain | https://commons.wikimedia.org/wiki/File:Kolob_Canyons_Viewpoint_(23336081549).jpg |
+| `activity-red-canyon.jpg` | Red Canyon | Christian David | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Sandstone_road_tunnel_on_Utah_State_Route_12,_Red_Canyon,_Utah.jpg |
+| `activity-coral-pink-sand-dunes.jpg` | Coral Pink Sand Dunes | Staplegunther (David Jolley) | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:Coral_Pink_Sand_Dunes_State_Park.jpg |
+| `activity-kodachrome-basin.jpg` | Kodachrome Basin | Photographersnature | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:Clouds_over_Kodachrome_Basin_State_Park.jpg |
+| `activity-snow-canyon-state-park.jpg` | Snow Canyon State Park | Wilson44691 | CC0 | https://commons.wikimedia.org/wiki/File:Snow_Canyon_Utah_March_2019.jpg |
+| `activity-capitol-reef-orchards.jpg` | Capitol Reef Orchards | No machine-readable author provided. Mav assumed (based on copyright claims). | CC BY-SA 2.5 | https://commons.wikimedia.org/wiki/File:Fruita_Schoolhouse.jpeg |
+| `activity-grand-canyon-south-rim.jpg` | Grand Canyon South Rim | Murray Foubister | CC BY-SA 2.0 | https://commons.wikimedia.org/wiki/File:Dawn_on_the_S_rim_of_the_Grand_Canyon_(8645178272).jpg |
+| `activity-horseshoe-bend.jpg` | Horseshoe Bend | Thomas Wolf, www.foto-tw.de | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:Grand_Canyon_Horseshoe_Bend.jpg |
+| `activity-antelope-canyon-guided.jpg` | Antelope Canyon (guided) | Lucas Löffler | Public domain | https://commons.wikimedia.org/wiki/File:USA_Antelope-Canyon.jpg |
+| `activity-desert-view-watchtower.jpg` | Desert View Watchtower | Grand Canyon National Park | Public domain | https://commons.wikimedia.org/wiki/File:Grand_Canyon_National_Park,_Desert_View_Watchtower_0165_-_Flickr_-_Grand_Canyon_NPS.jpg |
+| `activity-grand-canyon-railway.jpg` | Grand Canyon Railway | Jerry Huddleston | CC BY 2.0 | https://commons.wikimedia.org/wiki/File:Grand_Canyon_Railway_No._4128_-_March_2023.jpg |
+| `activity-bearizona-wildlife-park.jpg` | Bearizona Wildlife Park | User:ashstar01 | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:Bearizona_Arizona_animal_park.jpg |
+| `activity-glen-canyon-dam-overlook.jpg` | Glen Canyon Dam Overlook | Adbar | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:Glen_Canyon_Dam_and_Bridge.JPG |
+| `activity-monument-valley.jpg` | Monument Valley | Domenico Convertini | CC BY-SA 2.0 | https://commons.wikimedia.org/wiki/File:Monument_Valley,_Utah,_USA_(23611451292).jpg |
+| `activity-petrified-forest.jpg` | Petrified Forest | Jeffhollett | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Jasper_Forest_at_Petrified_Forest_NP_in_AZ_12.jpg |
+| `activity-meteor-crater.jpg` | Meteor Crater | National Map Seamless Server | Public domain | https://commons.wikimedia.org/wiki/File:Meteor_Crater_-_Arizona.jpg |
+| `activity-slide-rock-state-park.jpg` | Slide Rock State Park | Don Graham from Redlands, CA, USA - God bless it! | CC BY-SA 2.0 | https://commons.wikimedia.org/wiki/File:Slide_Rock,_Oak_Creek_Canyon,_AZ_9-15_(21721214731).jpg |
+| `activity-montezuma-castle.jpg` | Montezuma Castle | Beyond My Ken | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:2021_Montezuma_Castle_3.jpg |
+
 The other photos in this folder come from the Tripwise Design System.

@@ -185,6 +185,13 @@ input.tw-input { flex: none; height: var(--control-md); }
 .plan .tw-btn--outline .tw-spinner { border-color: rgba(77, 106, 109, 0.25); border-top-color: var(--deep-teal); }
 .plan.is-busy .plan__body { opacity: 0.55; }
 .plan.is-busy #back { color: var(--text-3); pointer-events: none; }
+/* Trip (screen 08), for the owner: Replace whole day under the activities, and the same busy state. */
+.trip__day-actions { display: flex; flex-direction: column; gap: 10px; }
+.trip__day-actions:has(#replace-day[hidden]) { display: none; }
+.trip.is-busy #activities, .trip.is-busy #tabs { opacity: 0.55; }
+.trip.is-busy #back { color: var(--text-3); pointer-events: none; }
+.trip .tw-btn--outline:disabled { background: var(--surface); border-color: var(--border); color: var(--text-3); }
+.trip .tw-btn--outline .tw-spinner { border-color: rgba(77, 106, 109, 0.25); border-top-color: var(--deep-teal); }
 .plan__options { margin: 0; padding: 0; border: none; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
 .plan__legend { padding: 0; margin-bottom: 10px; font: 700 18px/24px var(--font-display); }
 .plan__failed { display: flex; flex-direction: column; gap: 10px; }

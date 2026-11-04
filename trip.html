@@ -45,10 +45,53 @@
       <p class="trip__day-date" id="day-date"></p>
     </div>
     <div class="tw-stack tw-stack--tight" id="activities"></div>
-    <a class="tw-btn tw-btn--outline tw-btn--md tw-btn--block" id="edit-route" hidden></a>
+    <div class="trip__day-actions">
+      <div class="tw-notice tw-notice--error" id="day-failed" role="alert" hidden>
+        <span id="day-failed-icon"></span>
+        <p id="day-failed-text">We couldn't replace the day. Please try again.</p>
+      </div>
+      <button type="button" class="tw-btn tw-btn--outline tw-btn--md tw-btn--block" id="replace-day" hidden></button>
+    </div>
     <p class="tw-estimate" id="estimate"></p>
   </main>
 </div>
+
+<!-- Edit Activity (screen 06): a state of this page, not a page of its own -->
+<div class="plan" id="edit" hidden>
+  <header class="tw-navbar">
+    <button type="button" class="tw-iconbtn" id="edit-back" aria-label="Back to Trip Details"></button>
+    <h1 class="tw-navbar__title" id="edit-title" tabindex="-1">Edit Activity</h1>
+    <span></span>
+  </header>
+  <main class="plan__body plan__body--edit">
+    <section class="tw-current" aria-label="Current activity" id="current"></section>
+    <fieldset class="plan__options" id="options">
+      <legend class="plan__legend">Find a new activity</legend>
+      <div class="tw-status" id="alt-loading" role="status" hidden>
+        <div class="tw-status__row">
+          <span class="tw-status__icon"><span class="tw-spinner tw-spinner--teal"></span></span>
+          <p class="tw-status__title">Finding new activities…</p>
+        </div>
+      </div>
+      <div class="plan__failed" id="alt-failed" hidden>
+        <div class="tw-notice tw-notice--error" role="alert">
+          <span id="alt-failed-icon"></span>
+          <p>We couldn't find new activities. Please try again.</p>
+        </div>
+        <button type="button" class="tw-btn tw-btn--primary tw-btn--md tw-btn--block" id="alt-retry"></button>
+      </div>
+      <div class="tw-notice tw-notice--info" id="alt-none" role="status" hidden>
+        <p>No more new activities for this day. Try Replace whole day.</p>
+      </div>
+      <div class="tw-stack tw-stack--tight" id="alt-list"></div>
+    </fieldset>
+  </main>
+  <footer class="tw-footer plan__footer plan__footer--pair">
+    <button type="button" class="tw-btn tw-btn--primary" id="replace-activity">Replace activity</button>
+    <button type="button" class="tw-btn tw-btn--outline" id="cancel">Cancel</button>
+  </footer>
+</div>
+
 
 <div class="tw-scrim" hidden></div>
 <section class="tw-sheet" id="days-sheet" role="dialog" aria-modal="true" aria-labelledby="days-sheet-title" hidden>
@@ -69,6 +112,17 @@
   </div>
   <div class="tw-stack" id="activity-body"></div>
   <button type="button" class="tw-btn tw-btn--outline tw-btn--md tw-btn--block" data-sheet-close>Close</button>
+</section>
+
+<div class="tw-scrim" hidden></div>
+<section class="tw-sheet plan__confirm" id="confirm-sheet" role="dialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-text" hidden>
+  <div class="tw-sheet__handle"></div>
+  <h2 class="tw-sheet__title" id="confirm-title"></h2>
+  <p class="trip-sheet__text" id="confirm-text"></p>
+  <div class="plan__pair">
+    <button type="button" class="tw-btn tw-btn--primary" id="confirm-day">Replace day</button>
+    <button type="button" class="tw-btn tw-btn--outline" data-sheet-close>Cancel</button>
+  </div>
 </section>
 </body>
 </html>
