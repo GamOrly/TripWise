@@ -97,24 +97,32 @@ export function fitToWindow(page, { computerOnly = false, observe = [] } = {}) {
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-export function openSheet(sheet) {
+// returnFocus: what gets focus when the sheet closes (default: whatever had it when the sheet opened).
+// beforeClose: called when the owner closes the sheet (Esc, the scrim, a close button); returning false keeps it open.
+// The function returned closes the sheet without asking.
+export function openSheet(sheet, { returnFocus, beforeClose } = {}) {
   const scrim = sheet.previousElementSibling?.classList.contains('tw-scrim') ? sheet.previousElementSibling : null;
-  const opener = document.activeElement;
+  const opener = returnFocus || document.activeElement;
 
   const close = () => {
+    if (sheet.hidden) return;
     sheet.hidden = true;
     if (scrim) scrim.hidden = true;
     document.removeEventListener('keydown', onKey);
-    scrim?.removeEventListener('click', close);
-    sheet.querySelectorAll('[data-sheet-close]').forEach((b) => b.removeEventListener('click', close));
+    scrim?.removeEventListener('click', tryClose);
+    sheet.querySelectorAll('[data-sheet-close]').forEach((b) => b.removeEventListener('click', tryClose));
     document.body.style.overflow = '';
     if (opener instanceof HTMLElement) opener.focus();
+  };
+  const tryClose = () => {
+    if (beforeClose?.() === false) return;
+    close();
   };
 
   const onKey = (e) => {
     if (e.key === 'Escape') {
       e.preventDefault();
-      close();
+      tryClose();
       return;
     }
     if (e.key !== 'Tab') return;
@@ -131,12 +139,56 @@ export function openSheet(sheet) {
     }
   };
 
+  // On a computer the sheet opens in the middle of the window, where it was designed to start.
+  sheet.style.removeProperty('--dx');
+  sheet.style.removeProperty('--dy');
   if (scrim) scrim.hidden = false;
   sheet.hidden = false;
   document.body.style.overflow = 'hidden';
   document.addEventListener('keydown', onKey);
-  scrim?.addEventListener('click', close);
-  sheet.querySelectorAll('[data-sheet-close]').forEach((b) => b.addEventListener('click', close));
+  scrim?.addEventListener('click', tryClose);
+  sheet.querySelectorAll('[data-sheet-close]').forEach((b) => b.addEventListener('click', tryClose));
   (sheet.querySelector('input, select, textarea') || sheet.querySelector(FOCUSABLE))?.focus();
   return close;
 }
+
+// ---------- Moving a sheet (computer) ----------
+// On a wide window a sheet is a dialog in the middle of the screen (app.css). Its head is a handle: dragging it
+// moves the dialog anywhere in the window. The buttons in the head (Close) still work as buttons.
+
+const wide = matchMedia('(min-width: 900px)');
+
+document.addEventListener('pointerdown', (e) => {
+  const head = e.target.closest('.tw-sheet__head');
+  if (!head || !wide.matches || e.button !== 0 || e.target.closest('button, a, input')) return;
+  const sheet = head.closest('.tw-sheet');
+  const start = { x: e.clientX, y: e.clientY };
+  const from = {
+    x: parseFloat(sheet.style.getPropertyValue('--dx')) || 0,
+    y: parseFloat(sheet.style.getPropertyValue('--dy')) || 0,
+  };
+  const box = sheet.getBoundingClientRect();
+  // How far it may go: the whole title stays inside the window.
+  const room = {
+    left: -box.left + from.x, right: innerWidth - box.right + from.x,
+    up: -box.top + from.y, down: innerHeight - box.top - head.offsetHeight - 16 + from.y,
+  };
+  head.setPointerCapture(e.pointerId);
+  sheet.classList.add('is-dragging');
+  const move = (ev) => {
+    const x = Math.min(room.right, Math.max(room.left, from.x + ev.clientX - start.x));
+    const y = Math.min(room.down, Math.max(room.up, from.y + ev.clientY - start.y));
+    sheet.style.setProperty('--dx', `${x}px`);
+    sheet.style.setProperty('--dy', `${y}px`);
+  };
+  const stop = () => {
+    sheet.classList.remove('is-dragging');
+    head.removeEventListener('pointermove', move);
+    head.removeEventListener('pointerup', stop);
+    head.removeEventListener('pointercancel', stop);
+  };
+  head.addEventListener('pointermove', move);
+  head.addEventListener('pointerup', stop);
+  head.addEventListener('pointercancel', stop);
+  e.preventDefault();
+});

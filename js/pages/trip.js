@@ -1,12 +1,13 @@
 // Trip (screens 08 and 13): the itinerary by day. The owner also gets the Shared switch and, while the trip has not
 // ended, "Replace activity" and "Replace whole day" (editor.js): one change at a time, which shows at once and goes
 // into the trip only with "Save changes to trip". A visitor with the link only reads what was saved.
-// Flights, hotels and notes come in milestone 5.
+// Under the trip's name: flights, hotels and notes (logistics.js), which the owner may add and edit also after the trip.
 
-import { getTripForViewing, saveTrip, tripName, canEdit } from '../data.js';
+import { getTripForViewing, setShared, tripName, canEdit, canEditDetails } from '../data.js';
 import { formatRange } from '../dates.js';
 import { icon } from '../icons.js';
 import { routeEditor } from '../editor.js';
+import { logistics } from '../logistics.js';
 
 // Back to this page from the browser cache: load it again, so it never shows a route from before a change.
 window.addEventListener('pageshow', (e) => {
@@ -42,13 +43,14 @@ if (!found || !found.trip.plan) {
   if (owner) {
     paintShare();
     share.addEventListener('click', async () => {
-      trip = await saveTrip({ ...trip, is_shared: !trip.is_shared });
+      trip = { ...trip, is_shared: (await setShared(trip.id, !trip.is_shared)).is_shared };
       paintShare();
     });
   } else {
     document.getElementById('share').hidden = true;
   }
 
+  let details = null;
   routeEditor({
     trip,
     view: document.getElementById('trip'),
@@ -60,7 +62,19 @@ if (!found || !found.trip.plan) {
     lock: [back],
     onChange: (next) => {
       trip = next;
+      details?.setLocked(Boolean(next.pending));
     },
+  });
+
+  details = logistics({
+    trip,
+    editable: owner && canEditDetails(trip),
+  });
+  details.setLocked(Boolean(trip.pending));
+
+  // Notes that are not saved: the browser warns before the page is closed or reloaded.
+  window.addEventListener('beforeunload', (e) => {
+    if (details.notesDirty()) e.preventDefault();
   });
   document.getElementById('trip').hidden = false;
 }

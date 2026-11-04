@@ -46,7 +46,7 @@ export const dayLabel = (day) => `Day ${day.day_number} – ${day.city}`;
 // An activity card. The top part opens the details; with `onReplace` it also gets the "Replace activity" bar.
 // `pending`: the card shows a replacement that is not saved yet. `locked`: the bar is there but not available.
 export function activityCard(a, { onOpen, onReplace, pending = false, locked = false } = {}) {
-  const card = el('article', pending ? 'tw-activity is-pending' : 'tw-activity');
+  const card = el('article', `tw-activity${onReplace ? ' tw-activity--compact' : ''}${pending ? ' is-pending' : ''}`);
   const main = el('button', 'tw-activity__main');
   main.type = 'button';
   const text = el('div', 'tw-activity__text');
@@ -58,7 +58,9 @@ export function activityCard(a, { onOpen, onReplace, pending = false, locked = f
   if (chip) chips.appendChild(chip);
   if (chips.children.length) top.appendChild(chips);
   text.append(top, el('span', 'tw-activity__name', a.name), el('span', 'tw-activity__why', a.reason));
-  main.append(thumb(a), text, icon('chevron-right'));
+  // With "Replace activity", the card is compact: a small replace button takes the place of the ">" arrow.
+  main.append(thumb(a), text);
+  if (!onReplace) main.appendChild(icon('chevron-right'));
   main.setAttribute('aria-label', pending ? `${a.name}, not saved, details` : `${a.name}, details`);
   main.addEventListener('click', () => onOpen?.(a));
   card.appendChild(main);
@@ -67,7 +69,8 @@ export function activityCard(a, { onOpen, onReplace, pending = false, locked = f
     replace.type = 'button';
     replace.disabled = locked;
     replace.setAttribute('aria-label', `Replace ${a.name}`);
-    replace.append(icon('replace', { size: 'md' }), document.createTextNode('Replace activity'));
+    replace.title = 'Replace activity';
+    replace.appendChild(icon('replace'));
     replace.addEventListener('click', () => onReplace(a));
     card.appendChild(replace);
   }

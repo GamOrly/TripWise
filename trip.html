@@ -26,6 +26,7 @@
     <span></span>
   </header>
   <main class="trip__body">
+    <div class="trip__side">
     <div class="trip__head">
       <div>
         <h2 class="trip__name" id="name"></h2>
@@ -36,10 +37,13 @@
         <button type="button" class="tw-switch" role="switch" aria-checked="false" aria-labelledby="share-label" id="share-switch"></button>
       </div>
     </div>
+    <div class="logi-bar" id="logistics" role="group" aria-label="Flights, hotels and notes"></div>
     <div class="tw-notice tw-notice--info" id="share-notice" role="status" hidden>
       <p>Anyone with the link will see all trip details, including flights, hotels and notes.</p>
     </div>
     <div class="tw-daytabs" role="tablist" aria-label="Days" id="tabs"></div>
+    </div>
+    <div class="trip__main">
     <div>
       <h3 class="trip__day-title" id="day-title" tabindex="-1"></h3>
       <p class="trip__day-date" id="day-date"></p>
@@ -53,6 +57,7 @@
       <button type="button" class="tw-btn tw-btn--outline tw-btn--md tw-btn--block" id="replace-day" hidden></button>
     </div>
     <p class="tw-estimate" id="estimate"></p>
+    </div>
   </main>
   <div class="tw-footer trip__pending" id="pending" role="status" hidden>
     <div>
@@ -142,6 +147,156 @@
   <div class="plan__pair">
     <button type="button" class="tw-btn tw-btn--primary" data-sheet-close>Keep editing</button>
     <button type="button" class="tw-btn tw-btn--outline" id="leave">Leave</button>
+  </div>
+</section>
+<!-- Flights, hotels or notes of the trip (screen 16, in a sheet) -->
+<div class="tw-scrim" hidden></div>
+<section class="tw-sheet logi-sheet" id="details-sheet" role="dialog" aria-modal="true" aria-labelledby="details-title" hidden>
+  <div class="tw-sheet__handle"></div>
+  <div class="tw-sheet__head">
+    <h2 class="tw-sheet__title"><span class="tw-icon-tile" id="details-icon"></span><span id="details-title"></span></h2>
+    <button type="button" class="tw-iconbtn tw-iconbtn--round" data-sheet-close aria-label="Close" id="details-close"></button>
+  </div>
+  <div class="logi-sheet__body" id="details-body"></div>
+</section>
+
+<!-- Add flights (screen 14) -->
+<div class="tw-scrim" hidden></div>
+<section class="tw-sheet logi-sheet" id="flight-sheet" role="dialog" aria-modal="true" aria-labelledby="flight-title" hidden>
+  <div class="tw-sheet__handle"></div>
+  <div class="tw-sheet__head">
+    <h2 class="tw-sheet__title"><span class="tw-icon-tile" id="flight-icon"></span><span id="flight-title">Add flights</span></h2>
+    <button type="button" class="tw-iconbtn tw-iconbtn--round" data-sheet-close aria-label="Close" id="flight-close"></button>
+  </div>
+  <form class="logi-sheet__form" id="flight-form" novalidate>
+    <fieldset class="tw-sheet__group">
+      <legend>OUTBOUND</legend>
+      <div class="tw-grid-2">
+        <div class="tw-field" data-field="outbound.from">
+          <label class="tw-label" for="f-outbound-from">From</label>
+          <input class="tw-input" id="f-outbound-from" name="outbound.from" type="text" aria-describedby="f-outbound-from-error" placeholder="TLV" maxlength="4" autocapitalize="characters" autocomplete="off">
+          <p class="tw-field__error" id="f-outbound-from-error" hidden></p>
+        </div>
+        <div class="tw-field" data-field="outbound.to">
+          <label class="tw-label" for="f-outbound-to">To</label>
+          <input class="tw-input" id="f-outbound-to" name="outbound.to" type="text" aria-describedby="f-outbound-to-error" placeholder="NRT" maxlength="4" autocapitalize="characters" autocomplete="off">
+          <p class="tw-field__error" id="f-outbound-to-error" hidden></p>
+        </div>
+      </div>
+      <div class="tw-grid-2">
+        <div class="tw-field" data-field="outbound.date">
+          <label class="tw-label" for="f-outbound-date">Date</label>
+          <input class="tw-input" id="f-outbound-date" name="outbound.date" type="date" aria-describedby="f-outbound-date-error">
+          <p class="tw-field__error" id="f-outbound-date-error" hidden></p>
+        </div>
+        <div class="tw-field" data-field="outbound.flight_number">
+          <label class="tw-label" for="f-outbound-flight_number">Flight no. <span class="tw-label__optional">(optional)</span></label>
+          <input class="tw-input" id="f-outbound-flight_number" name="outbound.flight_number" type="text" aria-describedby="f-outbound-flight_number-error" placeholder="LY 91" maxlength="10" autocapitalize="characters" autocomplete="off">
+          <p class="tw-field__error" id="f-outbound-flight_number-error" hidden></p>
+        </div>
+      </div>
+      <div class="tw-grid-2">
+        <div class="tw-field" data-field="outbound.time">
+          <label class="tw-label" for="f-outbound-time">Departs <span class="tw-label__optional">(optional)</span></label>
+          <input class="tw-input" id="f-outbound-time" name="outbound.time" type="time" aria-describedby="f-outbound-time-error">
+          <p class="tw-field__error" id="f-outbound-time-error" hidden></p>
+        </div>
+        <div class="tw-field" data-field="outbound.arrival_time">
+          <label class="tw-label" for="f-outbound-arrival_time">Arrives <span class="tw-label__optional">(optional)</span></label>
+          <input class="tw-input" id="f-outbound-arrival_time" name="outbound.arrival_time" type="time" aria-describedby="f-outbound-arrival_time-error">
+          <p class="tw-field__error" id="f-outbound-arrival_time-error" hidden></p>
+        </div>
+      </div>
+    </fieldset>
+    <fieldset class="tw-sheet__group">
+      <legend>RETURN</legend>
+      <div class="tw-grid-2">
+        <div class="tw-field" data-field="return.from">
+          <label class="tw-label" for="f-return-from">From</label>
+          <input class="tw-input" id="f-return-from" name="return.from" type="text" aria-describedby="f-return-from-error" placeholder="NRT" maxlength="4" autocapitalize="characters" autocomplete="off">
+          <p class="tw-field__error" id="f-return-from-error" hidden></p>
+        </div>
+        <div class="tw-field" data-field="return.to">
+          <label class="tw-label" for="f-return-to">To</label>
+          <input class="tw-input" id="f-return-to" name="return.to" type="text" aria-describedby="f-return-to-error" placeholder="TLV" maxlength="4" autocapitalize="characters" autocomplete="off">
+          <p class="tw-field__error" id="f-return-to-error" hidden></p>
+        </div>
+      </div>
+      <div class="tw-grid-2">
+        <div class="tw-field" data-field="return.date">
+          <label class="tw-label" for="f-return-date">Date</label>
+          <input class="tw-input" id="f-return-date" name="return.date" type="date" aria-describedby="f-return-date-error">
+          <p class="tw-field__error" id="f-return-date-error" hidden></p>
+        </div>
+        <div class="tw-field" data-field="return.flight_number">
+          <label class="tw-label" for="f-return-flight_number">Flight no. <span class="tw-label__optional">(optional)</span></label>
+          <input class="tw-input" id="f-return-flight_number" name="return.flight_number" type="text" aria-describedby="f-return-flight_number-error" placeholder="LY 92" maxlength="10" autocapitalize="characters" autocomplete="off">
+          <p class="tw-field__error" id="f-return-flight_number-error" hidden></p>
+        </div>
+      </div>
+      <div class="tw-grid-2">
+        <div class="tw-field" data-field="return.time">
+          <label class="tw-label" for="f-return-time">Departs <span class="tw-label__optional">(optional)</span></label>
+          <input class="tw-input" id="f-return-time" name="return.time" type="time" aria-describedby="f-return-time-error">
+          <p class="tw-field__error" id="f-return-time-error" hidden></p>
+        </div>
+        <div class="tw-field" data-field="return.arrival_time">
+          <label class="tw-label" for="f-return-arrival_time">Arrives <span class="tw-label__optional">(optional)</span></label>
+          <input class="tw-input" id="f-return-arrival_time" name="return.arrival_time" type="time" aria-describedby="f-return-arrival_time-error">
+          <p class="tw-field__error" id="f-return-arrival_time-error" hidden></p>
+        </div>
+      </div>
+    </fieldset>
+    <p class="logi-sheet__hint">Each direction is optional. A direction you fill in needs its date.</p>
+    <div class="logi-sheet__actions">
+      <button type="submit" class="tw-btn tw-btn--primary">Save</button>
+      <button type="button" class="tw-btn tw-btn--outline" id="flight-remove" hidden>Remove flights</button>
+    </div>
+  </form>
+</section>
+
+<!-- Add hotel (screen 15) -->
+<div class="tw-scrim" hidden></div>
+<section class="tw-sheet logi-sheet" id="hotel-sheet" role="dialog" aria-modal="true" aria-labelledby="hotel-title" hidden>
+  <div class="tw-sheet__handle"></div>
+  <div class="tw-sheet__head">
+    <h2 class="tw-sheet__title"><span class="tw-icon-tile" id="hotel-icon"></span><span id="hotel-title">Add hotel</span></h2>
+    <button type="button" class="tw-iconbtn tw-iconbtn--round" data-sheet-close aria-label="Close" id="hotel-close"></button>
+  </div>
+  <form class="logi-sheet__form" id="hotel-form" novalidate>
+    <div class="tw-field" data-field="name">
+      <label class="tw-label" for="h-name">Hotel name</label>
+      <input class="tw-input" id="h-name" name="name" type="text" placeholder="e.g. Hotel Gracery Shinjuku" maxlength="80" autocomplete="off" aria-describedby="h-name-error">
+      <p class="tw-field__error" id="h-name-error" hidden></p>
+    </div>
+    <div class="tw-grid-2">
+      <div class="tw-field" data-field="check_in">
+        <label class="tw-label" for="h-check_in">Check-in</label>
+        <input class="tw-input" id="h-check_in" name="check_in" type="date" aria-describedby="h-check_in-error">
+        <p class="tw-field__error" id="h-check_in-error" hidden></p>
+      </div>
+      <div class="tw-field" data-field="check_out">
+        <label class="tw-label" for="h-check_out">Check-out</label>
+        <input class="tw-input" id="h-check_out" name="check_out" type="date" aria-describedby="h-check_out-error">
+        <p class="tw-field__error" id="h-check_out-error" hidden></p>
+      </div>
+    </div>
+    <div class="logi-sheet__actions">
+      <button type="submit" class="tw-btn tw-btn--primary">Save</button>
+      <button type="button" class="tw-btn tw-btn--outline" id="hotel-remove" hidden>Remove hotel</button>
+    </div>
+  </form>
+</section>
+
+<!-- Remove a flight or a hotel: asks first -->
+<div class="tw-scrim" hidden></div>
+<section class="tw-sheet plan__confirm" id="remove-sheet" role="dialog" aria-modal="true" aria-labelledby="remove-title" aria-describedby="remove-text" hidden>
+  <div class="tw-sheet__handle"></div>
+  <h2 class="tw-sheet__title" id="remove-title"></h2>
+  <p class="trip-sheet__text" id="remove-text"></p>
+  <div class="plan__pair">
+    <button type="button" class="tw-btn tw-btn--primary" id="remove-confirm">Remove</button>
+    <button type="button" class="tw-btn tw-btn--outline" data-sheet-close>Cancel</button>
   </div>
 </section>
 </body>

@@ -43,7 +43,7 @@ if (!session) {
     editable: true,
     saveLabel: 'Keep change',
     savedText: 'Change kept.',
-    inert: [$('details-body')],
+    inert: [$('tabs'), $('details-body')],
     lock: [back, saveBtn],
     lockWhilePending: [saveBtn],
     back,

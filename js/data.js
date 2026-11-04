@@ -12,7 +12,7 @@ import { todayISO, addDays, daysBetween, dayCount, tripTiming } from './dates.js
 
 const STORE_KEY = 'tripwise.demo.v1';
 // Bump when the demo data itself changes (new photos, new trips): saved demo data from older versions is rebuilt.
-const SEED_VERSION = 5;
+const SEED_VERSION = 6;
 const SESSION_KEY = 'tripwise.session.v1';
 const OWNER_ID = '00000000-0000-4000-8000-000000000001';
 
@@ -299,6 +299,7 @@ function buildSeed(today) {
         cities: ['Rome', 'Florence'], highlights: ['Classic sights in short visits', 'Gardens for the afternoons'],
         image: 'img/trip-italy.jpg', stops: [['Rome', 6], ['Florence', 6]],
       }),
+      notes: 'The kids loved the gelato near the Pantheon.\nVatican Museums: https://www.museivaticani.va',
     }),
     trip({
       id: 'trip-spain', destinations: ['Spain'], start_date: spainStart, end_date: addDays(spainStart, 10),
@@ -319,6 +320,11 @@ function buildSeed(today) {
         cities: ['Athens', 'Crete'], highlights: ['Short walks with a midday rest', 'Shallow beaches'],
         image: null, stops: [['Athens', 2], ['Crete', 5]],
       }),
+      flights: {
+        outbound: { date: greeceStart, time: '06:30', arrival_time: '09:05', from: 'TLV', to: 'ATH', flight_number: 'A3 929' },
+        return: { date: addDays(greeceStart, 6), time: '21:15', arrival_time: '23:10', from: 'HER', to: 'TLV', flight_number: 'A3 1928' },
+      },
+      hotels: [{ name: 'Electra Palace Athens', check_in: greeceStart, check_out: addDays(greeceStart, 2) }],
     }),
     trip({
       id: 'trip-japan', destinations: ['Japan'], start_date: japanStart, end_date: japanEnd,
@@ -330,8 +336,8 @@ function buildSeed(today) {
         image: 'img/route-pagoda.jpg', stops: [['Tokyo', 4], ['Hakone', 2], ['Kyoto', 3], ['Osaka', 2]],
       }),
       flights: {
-        outbound: { date: japanStart, time: '07:45', from: 'TLV', to: 'NRT', flight_number: 'LY 91' },
-        return: { date: japanEnd, time: '13:20', from: 'KIX', to: 'TLV', flight_number: 'LY 98' },
+        outbound: { date: japanStart, time: '23:10', arrival_time: '17:40', from: 'TLV', to: 'NRT', flight_number: 'LY 91' },
+        return: { date: japanEnd, time: '13:20', arrival_time: '19:35', from: 'KIX', to: 'TLV', flight_number: 'LY 98' },
       },
       hotels: [
         { name: 'Hotel Gracery Shinjuku', check_in: japanStart, check_out: addDays(japanStart, 4) },
@@ -676,6 +682,144 @@ export async function saveAsTrip(id) {
   noPending(t);
   t.status = 'saved';
   delete t.avoid;
+  save(state);
+  return clone(t);
+}
+
+// ---------- Flights, hotels and notes (F17, F18, F19) ----------
+// The owner adds them to a saved trip, also one that has ended. Each save is explicit (the sheet's Save,
+// "Save notes"), and none while a route change waits to be saved or discarded.
+
+export const NOTES_MAX = 2000;
+export const HOTEL_NAME_MAX = 80;
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
+const LEG_FIELDS = ['from', 'to', 'date', 'time', 'arrival_time', 'flight_number'];
+
+export function canEditDetails(t) {
+  return t?.status === 'saved';
+}
+
+async function detailsTrip(state, id) {
+  const t = state.trips.find((x) => x.id === id);
+  if (!(await getSession()) || !canEditDetails(t)) throw new Error('This trip is not available.');
+  noPending(t);
+  return t;
+}
+
+// A flight leg as typed: trimmed, airport codes in capitals, empty fields left out. null when nothing was typed.
+function cleanLeg(leg) {
+  if (!leg) return null;
+  const out = {};
+  for (const k of LEG_FIELDS) {
+    let v = String(leg[k] ?? '').trim();
+    if (k === 'from' || k === 'to' || k === 'flight_number') v = v.toUpperCase();
+    if (v) out[k] = v;
+  }
+  return Object.keys(out).length ? out : null;
+}
+
+// Errors by field ('outbound.date', 'return.time', …), empty when the flights may be saved.
+// Each direction is optional, but a direction with anything typed in it needs its date.
+export function flightErrors(flights) {
+  const errors = {};
+  const legs = { outbound: cleanLeg(flights?.outbound), return: cleanLeg(flights?.return) };
+  for (const [dir, leg] of Object.entries(legs)) {
+    if (!leg) continue;
+    if (!leg.date) errors[`${dir}.date`] = `Enter the ${dir} date.`;
+    else if (!ISO_DATE.test(leg.date)) errors[`${dir}.date`] = 'Enter a valid date.';
+    for (const k of ['time', 'arrival_time']) if (leg[k] && !TIME.test(leg[k])) errors[`${dir}.${k}`] = 'Enter a valid time.';
+    for (const k of ['from', 'to']) if (leg[k] && leg[k].length > 4) errors[`${dir}.${k}`] = 'Use the airport code, up to 4 letters.';
+    if (leg.flight_number && leg.flight_number.length > 10) errors[`${dir}.flight_number`] = 'Up to 10 characters.';
+  }
+  if (!legs.outbound && !legs.return) errors['outbound.date'] = 'Enter the outbound date.';
+  if (legs.outbound?.date && legs.return?.date && !errors['return.date'] && legs.return.date < legs.outbound.date) {
+    errors['return.date'] = "Return can't be before outbound.";
+  }
+  return errors;
+}
+
+export function hotelErrors(hotel) {
+  const errors = {};
+  const name = String(hotel?.name ?? '').trim();
+  const checkIn = String(hotel?.check_in ?? '');
+  const checkOut = String(hotel?.check_out ?? '');
+  if (!name) errors.name = 'Enter the hotel name.';
+  else if (name.length > HOTEL_NAME_MAX) errors.name = `Up to ${HOTEL_NAME_MAX} characters.`;
+  if (!checkIn) errors.check_in = 'Enter the check-in date.';
+  else if (!ISO_DATE.test(checkIn)) errors.check_in = 'Enter a valid date.';
+  if (!checkOut) errors.check_out = 'Enter the check-out date.';
+  else if (!ISO_DATE.test(checkOut)) errors.check_out = 'Enter a valid date.';
+  if (!errors.check_in && !errors.check_out && checkOut <= checkIn) errors.check_out = 'Check-out must be after check-in.';
+  return errors;
+}
+
+const invalid = (errors) => {
+  if (Object.keys(errors).length) throw new Error(Object.values(errors)[0]);
+};
+
+// Save on Add flights / Edit flights. Checked here too, like the database would.
+export async function saveFlights(id, flights) {
+  const state = load();
+  const t = await detailsTrip(state, id);
+  invalid(flightErrors(flights));
+  t.flights = { outbound: cleanLeg(flights.outbound), return: cleanLeg(flights.return) };
+  save(state);
+  return clone(t);
+}
+
+export async function removeFlights(id) {
+  const state = load();
+  const t = await detailsTrip(state, id);
+  t.flights = null;
+  save(state);
+  return clone(t);
+}
+
+const byCheckIn = (a, b) => a.check_in.localeCompare(b.check_in) || a.check_out.localeCompare(b.check_out);
+
+// Adds a hotel (index null) or changes the one at `index`. The list stays in check-in order.
+export async function saveHotel(id, index, hotel) {
+  const state = load();
+  const t = await detailsTrip(state, id);
+  invalid(hotelErrors(hotel));
+  const row = { name: hotel.name.trim(), check_in: hotel.check_in, check_out: hotel.check_out };
+  const hotels = [...(t.hotels || [])];
+  if (index == null) hotels.push(row);
+  else if (hotels[index]) hotels[index] = row;
+  else throw new Error('This hotel is not available.');
+  t.hotels = hotels.sort(byCheckIn);
+  save(state);
+  return clone(t);
+}
+
+export async function removeHotel(id, index) {
+  const state = load();
+  const t = await detailsTrip(state, id);
+  if (!t.hotels?.[index]) throw new Error('This hotel is not available.');
+  t.hotels = t.hotels.filter((_, i) => i !== index);
+  if (!t.hotels.length) t.hotels = null;
+  save(state);
+  return clone(t);
+}
+
+// "Save notes". Empty notes are saved as null.
+export async function saveNotes(id, text) {
+  const state = load();
+  const t = await detailsTrip(state, id);
+  const notes = String(text ?? '').replace(/\s+$/, '');
+  if (notes.length > NOTES_MAX) throw new Error(`Notes can be up to ${NOTES_MAX} characters.`);
+  t.notes = notes.trim() ? notes : null;
+  save(state);
+  return clone(t);
+}
+
+// The Shared switch: only this field changes, so nothing else on the trip is written from an old copy.
+export async function setShared(id, shared) {
+  const state = load();
+  const t = state.trips.find((x) => x.id === id);
+  if (!(await getSession()) || t?.status !== 'saved') throw new Error('This trip is not available.');
+  t.is_shared = Boolean(shared);
   save(state);
   return clone(t);
 }
