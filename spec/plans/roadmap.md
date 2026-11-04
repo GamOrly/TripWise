@@ -49,4 +49,4 @@
 - Vercel: `api/ask.js`, CORS, אימות JWT (F4).
 - Gemini: יצירת 3 מסלולים והחלפת פעילות/יום, בדיקת JSON, `ai-tests.md` (F5, F6, F9, F16).
 - n8n: תזכורת במייל (F12).
-- עדכון `ARCHITECTURE.md` ו-`MILESTONES.md` לכניסה בקישור למייל.
+- ~~עדכון `ARCHITECTURE.md` ו-`MILESTONES.md` לכניסה בקישור למייל.~~ נעשה ב-04.11.2026, יחד עם `ARCHITECTURE.md` סעיף 11 (החלטות הפרונט שמשפיעות על הבקאנד).

@@ -6,7 +6,8 @@
 - `spec/product-10-definitions.md` – מקור האמת
 - `spec/MVP.md`, `spec/PRD.md`, `spec/ARCHITECTURE.md`, `spec/DESIGN.md`, `spec/MILESTONES.md`, `spec/tech-stack.md`
 - `spec/reference/` – חומרי רקע: `course-stack.md`, `tripWise_inputs.md`, ותמונות (wireframes, mockups, style-guide, inspiration-board)
-- כשיש סתירה בין מסמכים, המסמך העדכני קובע: PRD ו-DESIGN (02.11.2026) קובעים כניסה **בקישור למייל, בלי סיסמה**. ARCHITECTURE ו-MILESTONES עוד מתארים סיסמה, ויש לעדכן אותם בתחילת מיילסטון 1.
+- כשיש סתירה בין מסמכים, המסמך העדכני קובע. הכניסה היא **בקישור למייל, בלי סיסמה** (PRD ו-DESIGN מ-02.11.2026; ARCHITECTURE ו-MILESTONES עודכנו ב-04.11.2026).
+- לפני שלב הבקאנד: לקרוא את `spec/ARCHITECTURE.md` סעיף 11, עם ההחלטות מבניית הפרונט שהבקאנד צריך לממש.
 
 ## הנחיה שוטפת
 במהלך ההקמה ובכל מיילסטון: להנחות את המשתמשת צעד אחר צעד מהו השלב הבא, בצורה עניינית, קצרה, מצומצמת וברורה.
